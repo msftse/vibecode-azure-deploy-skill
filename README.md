@@ -26,7 +26,7 @@ Vibe-coded apps need to ship the moment they work. Azure already has the primiti
 
 <img src="docs/architecture.svg" alt="vibecode-azure-deploy architecture" width="100%">
 
-- **Developer** runs `deploy-azure up` after a one-time `init`.
+- **Agent** runs `deploy-azure up` after a one-time `init`.
 - The **CLI** is a single stdlib-only Python script. No pip installs, no node_modules.
 - For **Express**, the script uses `az containerapp env create --environment-mode express` (`containerapp` extension ≥ 1.3.0b4), with full first-class CLI support.
 - For **Flex** (the fallback profile for regions where Express isn't available yet), the CLI talks directly to the **ARM REST API** (`Microsoft.App` provider, api-version `2025-10-02-preview`), because `az` hasn't shipped a friendly workload-profile flag yet.
