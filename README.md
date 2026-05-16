@@ -54,14 +54,28 @@ Prereqs: `az` ≥ 2.85, the `containerapp` extension ≥ 1.3.0b4 (`az extension 
 
 ### Live proof
 
-A real backend was deployed end-to-end with this script on the Flex profile in West Europe (Express preview wasn't available in that region):
+Two apps were deployed end-to-end with this script on the Flex profile in West Europe.
+
+**deadpool** (full-stack, May 2026) - a graveyard of dead startup ideas with Shakespearean eulogies. FastAPI + Postgres Flexible Server + static frontend, all behind one Container App. Scaffolded, provisioned, and deployed by an AI agent following [`AGENTS.md`](AGENTS.md):
+
+```
+GET  https://ca-deadpool.kindflower-420c2c9e.westeurope.azurecontainerapps.io/healthz
+=> 200 {"ok": true}
+
+POST https://ca-deadpool.kindflower-420c2c9e.westeurope.azurecontainerapps.io/api/ideas
+=> 201 {"id":1,"name":"NFT Litter Box","eulogy":"Lo, where NFT Litter Box now sleepeth!..."}
+```
+
+Wall time: cloud build ~35s, managed env ~3 min (cold ARM region), container app ~30s. Repo: [github.com/msftse/deadpool](https://github.com/msftse/deadpool) (if published).
+
+**ca-vibecode-demo** (backend-only smoke):
 
 ```
 GET https://ca-vibecode-demo.delightfulhill-c9a8cab6.westeurope.azurecontainerapps.io/healthz
 => 200 {"ok": true}
 ```
 
-Build: ~45s (cloud build). Env: ~20s. App: ~15s. Total wall: ~90s.
+Build: ~45s (cloud build). Env: ~20s. App: ~15s. Total wall: ~90s (env was already warm).
 
 Express deploys in the supported preview regions (West Central US, East Asia) finish noticeably faster. Microsoft's announcement post calls out sub-second cold starts and "running in seconds, not minutes" because there's no env to provision.
 

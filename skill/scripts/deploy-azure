@@ -392,6 +392,21 @@ def cmd_init(args: argparse.Namespace) -> int:
              "eastasia. Defaulting region to eastasia (closest to EMEA). "
              "Override with --region to pin somewhere else.")
         region = "eastasia"
+    elif profile == "express" and region not in EXPRESS_REGIONS:
+        # User explicitly chose an Express-incompatible region.
+        warn(f"--profile express requested but region '{region}' is not in the "
+             f"Express preview list {sorted(EXPRESS_REGIONS)}. "
+             f"Downgrading to --profile flex so the deploy will succeed. "
+             f"Rerun with --region westcentralus or --region eastasia for true "
+             f"Express scale-to-zero.")
+        profile = "flex"
+    elif profile == "flex" and region not in FLEX_REGIONS:
+        warn(f"--profile flex requested but region '{region}' is not in the "
+             f"known Flex preview list {sorted(FLEX_REGIONS)}. Proceeding "
+             f"anyway in case Microsoft has expanded availability. If the "
+             f"managed env create fails with WorkloadProfileNotSupported, "
+             f"rerun with --region westeurope, --region eastus, or "
+             f"--region eastus2.")
     cfg_data: dict = {
         "project": {
             "name": name,

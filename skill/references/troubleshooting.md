@@ -1,5 +1,13 @@
 # Troubleshooting
 
+## `ARM REST GET ... failed: ResourceNotFound` on managed env or container app
+
+You're on a deploy-azure script older than commit `c6c0906` (May 2026). That version raised on the GET-existence check used to make provisioning idempotent. `pull` the latest and re-run `deploy-azure up` — it will resume from the failed step. The fix lives in `az_rest()`: GETs that return 404 now return `None` so the caller falls through to `PUT`.
+
+## `--profile express` deploys but lands on Flex anyway
+
+You passed a region that isn't in the Express preview list (`westcentralus`, `eastasia`). The script downgrades the profile and prints a warning. To get true scale-to-zero Express, rerun with `--region westcentralus` or `--region eastasia`.
+
 ## `ContainerAppInvalidResourceTotal`
 
 You picked a CPU/memory combo that isn't on the Flex matrix. Allowed pairs:
