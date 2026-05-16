@@ -76,10 +76,10 @@ EXPRESS_REGIONS = {"westcentralus", "eastasia"}
 # ---------------------------------------------------------------------------
 
 def info(msg: str) -> None:
-    print(f"\033[36m→\033[0m {msg}")
+    print(f"\033[36m→\033[0m {msg}", file=sys.stderr)
 
 def ok(msg: str) -> None:
-    print(f"\033[32m✓\033[0m {msg}")
+    print(f"\033[32m✓\033[0m {msg}", file=sys.stderr)
 
 def warn(msg: str) -> None:
     print(f"\033[33m!\033[0m {msg}", file=sys.stderr)
@@ -501,6 +501,18 @@ def cmd_up(args: argparse.Namespace) -> int:
         frontend_url = _ensure_frontend(cfg, backend_url)
 
     elapsed = time.time() - start
+    if getattr(args, "json", False):
+        print(json.dumps({
+            "ok": True,
+            "profile": profile,
+            "region": cfg.region,
+            "resource_group": cfg.rg,
+            "backend_url": f"https://{backend_url}" if backend_url else None,
+            "frontend_url": f"https://{frontend_url}" if frontend_url else None,
+            "elapsed_seconds": round(elapsed, 1),
+            "arm_api_version": ARM_API_VERSION,
+        }, indent=2))
+        return 0
     print()
     _print_banner(profile, elapsed, backend_url, frontend_url)
     return 0
@@ -988,25 +1000,55 @@ def cmd_logs(args: argparse.Namespace) -> int:
 def cmd_status(args: argparse.Namespace) -> int:
     cfg = Config.load()
     ensure_auth()
-    print(f"Project       : {cfg.project}")
-    print(f"Region        : {cfg.region}")
-    print(f"Resource group: {cfg.rg}")
-    print(f"Profile       : {(cfg.backend or {}).get('profile', 'n/a')}")
-    print()
+
+    state: dict = {
+        "project": cfg.project,
+        "region": cfg.region,
+        "resource_group": cfg.rg,
+        "profile": (cfg.backend or {}).get("profile", None),
+        "backend": None,
+        "frontend": None,
+        "db": None,
+    }
+
     if cfg.backend:
         app = cfg.backend["app_name"]
         fqdn = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app,
                         "--query", "properties.configuration.ingress.fqdn"])
-        print(f"Backend  ({app}): https://{fqdn}" if fqdn
-              else f"Backend  ({app}): (not deployed yet)")
+        state["backend"] = {
+            "name": app,
+            "url": f"https://{fqdn}" if fqdn else None,
+            "deployed": bool(fqdn),
+        }
     if cfg.frontend:
         swa = cfg.frontend["swa_name"]
         host = az_json(["staticwebapp", "show", "-g", cfg.rg, "-n", swa,
                         "--query", "defaultHostname"])
-        print(f"Frontend ({swa}): https://{host}" if host
-              else f"Frontend ({swa}): (not deployed yet)")
+        state["frontend"] = {
+            "name": swa,
+            "url": f"https://{host}" if host else None,
+            "deployed": bool(host),
+        }
     if cfg.db:
-        print(f"DB            : {cfg.db['kind']} ({cfg.db.get('server')})")
+        state["db"] = {"kind": cfg.db["kind"], "server": cfg.db.get("server")}
+
+    if getattr(args, "json", False):
+        print(json.dumps(state, indent=2))
+        return 0
+
+    print(f"Project       : {state['project']}")
+    print(f"Region        : {state['region']}")
+    print(f"Resource group: {state['resource_group']}")
+    print(f"Profile       : {state['profile'] or 'n/a'}")
+    print()
+    if state["backend"]:
+        b = state["backend"]
+        print(f"Backend  ({b['name']}): {b['url'] or '(not deployed yet)'}")
+    if state["frontend"]:
+        f = state["frontend"]
+        print(f"Frontend ({f['name']}): {f['url'] or '(not deployed yet)'}")
+    if state["db"]:
+        print(f"DB            : {state['db']['kind']} ({state['db']['server']})")
     print()
     run(["az", "resource", "list", "-g", cfg.rg, "-o", "table"], check=False)
     return 0
@@ -1024,6 +1066,134 @@ def cmd_destroy(args: argparse.Namespace) -> int:
     run(["az", "group", "delete", "-n", cfg.rg, "--yes", "--no-wait"])
     ok("Deletion initiated (runs in background).")
     return 0
+
+
+# ---------------------------------------------------------------------------
+# doctor — preflight check for agent callers
+# ---------------------------------------------------------------------------
+
+def cmd_doctor(args: argparse.Namespace) -> int:
+    """Validate environment before an agent attempts a deploy.
+
+    Exit code 0 = ready to deploy. Exit code 1 = blocking issue found.
+    With --json, emits a single JSON object describing all checks and exits
+    0/1 accordingly.
+    """
+    checks: list[dict] = []
+
+    def add(name: str, ok_: bool, detail: str, hint: str = "") -> None:
+        checks.append({"name": name, "ok": ok_, "detail": detail, "hint": hint})
+
+    # 1. az CLI present + version
+    cp = subprocess.run(["az", "version", "-o", "json"],
+                        capture_output=True, text=True)
+    if cp.returncode != 0:
+        add("az_cli", False, "az not found on PATH",
+            "Install: https://learn.microsoft.com/cli/azure/install-azure-cli")
+    else:
+        try:
+            ver = json.loads(cp.stdout)
+            az_ver = ver.get("azure-cli", "?")
+            ca_ver = ver.get("extensions", {}).get("containerapp", "missing")
+            ok_v = tuple(int(x) for x in az_ver.split(".")[:2]) >= (2, 85)
+            add("az_cli", ok_v, f"az {az_ver}",
+                "" if ok_v else "Upgrade: az upgrade  (need ≥ 2.85)")
+            add("containerapp_ext",
+                ca_ver != "missing",
+                f"containerapp ext: {ca_ver}",
+                "" if ca_ver != "missing"
+                else "Install: az extension add -n containerapp")
+        except Exception as e:
+            add("az_cli", False, f"could not parse az version: {e}", "")
+
+    # 2. login state
+    acct = az_json(["account", "show"])
+    if not acct:
+        add("login", False, "not logged in",
+            "Run: az login  (or set AZURE_* env vars for SP auth)")
+    else:
+        add("login", True,
+            f"{acct.get('user', {}).get('name', '?')} → "
+            f"{acct.get('name', '?')} ({acct.get('id', '?')[:8]}…)")
+
+    # 3. azure.toml + region/profile validity
+    cfg_present = CONFIG_PATH.exists()
+    add("azure_toml", cfg_present,
+        str(CONFIG_PATH) if cfg_present else "no azure.toml in cwd",
+        "" if cfg_present else "Run: deploy-azure init")
+
+    region = profile = None
+    if cfg_present:
+        try:
+            cfg = Config.load()
+            region = cfg.region
+            profile = (cfg.backend or {}).get("profile")
+            if profile == "express":
+                ok_r = region in EXPRESS_REGIONS
+                add("region_profile", ok_r,
+                    f"profile=express region={region}",
+                    "" if ok_r else
+                    f"Express preview is gated to {sorted(EXPRESS_REGIONS)}. "
+                    f"Re-init with --region eastasia or --region westcentralus, "
+                    f"or downgrade --profile flex.")
+            elif profile == "flex":
+                ok_r = region in FLEX_REGIONS
+                add("region_profile", ok_r,
+                    f"profile=flex region={region}",
+                    "" if ok_r else
+                    f"Flex preview is gated to {sorted(FLEX_REGIONS)}.")
+            elif profile == "consumption":
+                add("region_profile", True,
+                    f"profile=consumption region={region}")
+            elif profile is None and cfg.frontend:
+                add("region_profile", True, "frontend-only project")
+            else:
+                add("region_profile", False,
+                    f"unknown profile: {profile}",
+                    "Set [backend] profile = \"express\" | \"flex\" | \"consumption\"")
+        except Exception as e:
+            add("region_profile", False, f"azure.toml parse failed: {e}", "")
+
+    # 4. ACR name availability (cheap pre-flight)
+    if cfg_present:
+        try:
+            b = (Config.load().backend or {})
+            acr = b.get("acr_name")
+            if acr:
+                cp2 = run(["az", "acr", "check-name", "-n", acr,
+                           "-o", "json"], check=False, capture=True)
+                if cp2.returncode == 0:
+                    data = json.loads(cp2.stdout or "{}")
+                    if data.get("nameAvailable") is True:
+                        add("acr_name", True,
+                            f"{acr}: available (will be created)")
+                    elif "already" in (data.get("message") or "").lower():
+                        # Already exists — fine if it's in our RG; we'll reuse.
+                        add("acr_name", True, f"{acr}: exists (will reuse)")
+                    else:
+                        add("acr_name", False,
+                            f"{acr}: {data.get('message', 'unavailable')}",
+                            "Pick a different [backend] acr_name in azure.toml.")
+        except Exception as e:
+            add("acr_name", False, f"acr check failed: {e}", "")
+
+    overall_ok = all(c["ok"] for c in checks)
+
+    if getattr(args, "json", False):
+        print(json.dumps({"ok": overall_ok, "checks": checks}, indent=2))
+    else:
+        print()
+        for c in checks:
+            mark = "\033[32m✓\033[0m" if c["ok"] else "\033[31m✗\033[0m"
+            print(f"  {mark}  {c['name']:18}  {c['detail']}")
+            if not c["ok"] and c["hint"]:
+                print(f"      → {c['hint']}")
+        print()
+        if overall_ok:
+            ok("All preflight checks passed. `deploy-azure up` should work.")
+        else:
+            err("Preflight failed. Fix the items above before `up`.")
+    return 0 if overall_ok else 1
 
 
 # ---------------------------------------------------------------------------
@@ -1055,6 +1225,8 @@ def build_parser() -> argparse.ArgumentParser:
                       choices=["express", "flex", "consumption"], default=None,
                       help="Override the profile from azure.toml.")
     p_up.add_argument("--yes", action="store_true")
+    p_up.add_argument("--json", action="store_true",
+                      help="Emit a JSON summary on success (machine-readable).")
     p_up.set_defaults(func=cmd_up)
 
     p_db = sub.add_parser("db", help="Database management.")
@@ -1076,7 +1248,16 @@ def build_parser() -> argparse.ArgumentParser:
     p_logs.set_defaults(func=cmd_logs)
 
     p_status = sub.add_parser("status", help="Show deployed resources + URLs.")
+    p_status.add_argument("--json", action="store_true",
+                          help="Emit JSON state (machine-readable).")
     p_status.set_defaults(func=cmd_status)
+
+    p_doctor = sub.add_parser(
+        "doctor",
+        help="Preflight check: az version, login, region/profile, ACR name.")
+    p_doctor.add_argument("--json", action="store_true",
+                          help="Emit JSON check report.")
+    p_doctor.set_defaults(func=cmd_doctor)
 
     p_destroy = sub.add_parser("destroy", help="Delete the resource group.")
     p_destroy.add_argument("--yes", action="store_true")

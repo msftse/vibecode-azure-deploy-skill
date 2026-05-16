@@ -51,7 +51,7 @@ Final line of stdout on a successful `up` is always the public URL. An agent can
 URL=$(deploy-azure up --yes | tail -n1)
 ```
 
-A planned JSON output mode (`--json`) is on the roadmap below; until it ships, parse text output line-by-line.
+A `--json` flag is available on `up`, `status`, and `doctor` for machine-readable output. Progress chatter is routed to stderr, so `command --json 2>/dev/null` returns clean JSON on stdout.
 
 ## Idempotency contract (this matters)
 
@@ -127,9 +127,10 @@ If you patch this repo:
 
 Tracked for the next release:
 
-- [ ] `--json` flag on every command emitting `{ok, ...}` envelopes
-- [ ] Stable error `code` strings in the JSON envelope (matches the recovery table above)
-- [ ] `deploy-azure doctor`: pre-flight check that returns a JSON capability report (az version, extension version, login state, region availability)
+- [x] `--json` flag on `up`, `status`, `doctor` emitting structured output
+- [x] `deploy-azure doctor`: pre-flight check (az version, extension version, login state, region/profile validity, ACR name availability)
+- [ ] Stable error `code` strings in JSON failure envelopes
+- [ ] `--json` on remaining commands (`init`, `db add`, `logs`, `destroy`)
 - [ ] `--quiet` flag suppressing progress logs (only final URL on stdout)
 
 PRs adding any of these are very welcome.
