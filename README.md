@@ -4,7 +4,9 @@
 
 # vibecode-azure-deploy
 
-**Ship full-stack apps to Azure with one command. Vercel-grade DX, powered by Azure Container Apps Express.**
+**A skill that lets AI coding agents ship full-stack apps to Azure with one command. Vercel-grade DX, powered by Azure Container Apps Express.**
+
+> **Built for agents.** This repo is optimized for AI agents (Claude Code, Codex, Cursor, Hermes, OpenCode) to consume as a tool. See [`AGENTS.md`](AGENTS.md) for the machine-readable contract: command shapes, exit codes, idempotency rules, and recovery patterns.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-0078D4.svg)](LICENSE)
 [![Azure](https://img.shields.io/badge/Azure-Container%20Apps%20Express-0078D4.svg?logo=microsoftazure&logoColor=white)](https://learn.microsoft.com/azure/container-apps/express-overview)

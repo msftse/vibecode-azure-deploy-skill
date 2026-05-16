@@ -1,4 +1,8 @@
-# azure.toml — managed by deploy-azure (edits preserved)
+# azure.toml. managed by deploy-azure (edits preserved)
+#
+# This file is the single source of truth for an agent or human running
+# `deploy-azure up`. Re-running is always safe. See AGENTS.md in the repo
+# root for the full agent contract.
 
 [project]
 name = "my-app"
@@ -10,10 +14,10 @@ path = "backend"
 port = 8000
 app_name = "ca-my-app"
 acr_name = "myappacr"
-profile = "flex"            # "flex" (default) or "consumption"
+profile = "flex"            # "express" | "flex" | "consumption"
 cpu = 0.5                   # Flex requires one of the exact pairs (see docs/flex-vs-consumption.md)
 memory = "2Gi"
-min_replicas = 1            # Flex preview requires ≥ 1; consumption can use 0
+min_replicas = 1            # Flex preview requires ≥ 1; express/consumption can use 0
 max_replicas = 10
 
 [frontend]

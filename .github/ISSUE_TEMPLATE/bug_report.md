@@ -5,26 +5,32 @@ title: "[bug] "
 labels: bug
 ---
 
+**Profile + region**
+
+- Profile (`express` | `flex` | `consumption`):
+- Region:
+
 **What happened?**
 
 **Expected behavior**
 
 **Reproduction steps**
 
-1.
-2.
-3.
+```bash
+# exact commands, in order
+```
 
 **Environment**
 
 - OS:
-- `az --version` output:
+- `az --version` (full output, including containerapp extension version):
 - Python version (`python3 --version`):
-- Docker version (`docker --version`):
-- Region:
+- Reporter: human / agent (which one?):
 
-**Logs / error output**
+**Full command output**
 
 ```
-paste here
+paste the full stderr + stdout here, not a paraphrase
 ```
+
+**If this was reported by an AI agent:** include the recovery steps the agent already attempted (re-run? profile fallback? region change?) so we know what didn't work.
