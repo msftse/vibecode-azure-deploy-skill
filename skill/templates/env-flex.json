@@ -1,0 +1,8 @@
+{
+  "location": "westeurope",
+  "properties": {
+    "workloadProfiles": [
+      { "name": "Flex", "workloadProfileType": "Flex" }
+    ]
+  }
+}

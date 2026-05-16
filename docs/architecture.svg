@@ -1,0 +1,109 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-label="vibecode-azure-deploy architecture">
+  <defs>
+    <style>
+      .bg     { fill: #1F1F1F; }
+      .box    { fill: #2B2B2B; stroke: #0078D4; stroke-width: 1.5; }
+      .boxDeep{ fill: #2B2B2B; stroke: #50E6FF; stroke-width: 1.5; }
+      .flexBox{ fill: #1B2A3A; stroke: #0078D4; stroke-width: 1.5; stroke-dasharray: 6 4; }
+      .arrow  { stroke: #50E6FF; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+      .arrowDim { stroke: #8A8886; stroke-width: 1.2; fill: none; marker-end: url(#arrowheadDim); stroke-dasharray: 4 3; }
+      .title  { font-size: 22px; font-weight: 600; fill: #50E6FF; font-family: 'Segoe UI', system-ui, sans-serif; }
+      .label  { font-size: 13px; fill: #FFFFFF; font-family: 'Segoe UI', system-ui, sans-serif; }
+      .sublabel { font-size: 11px; fill: #C8C6C4; font-family: 'Segoe UI', system-ui, sans-serif; }
+      .callout { font-size: 12px; font-style: italic; fill: #50E6FF; font-family: 'Segoe UI', system-ui, sans-serif; }
+      .legendText { font-size: 11px; fill: #C8C6C4; font-family: 'Segoe UI', system-ui, sans-serif; }
+    </style>
+    <marker id="arrowhead" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#50E6FF"/>
+    </marker>
+    <marker id="arrowheadDim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8A8886"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="1200" height="700"/>
+
+  <text class="title" x="600" y="40" text-anchor="middle">vibecode-azure-deploy · architecture</text>
+  <text class="sublabel" x="600" y="60" text-anchor="middle">Static Web Apps + Container Apps (Flex profile) + Postgres Flexible Server, provisioned via ARM REST</text>
+
+  <g transform="translate(40,140)">
+    <rect class="boxDeep" x="0" y="0" width="160" height="80" rx="6"/>
+    <text class="label" x="80" y="32" text-anchor="middle">Developer</text>
+    <text class="sublabel" x="80" y="52" text-anchor="middle">deploy-azure up</text>
+  </g>
+
+  <g transform="translate(240,140)">
+    <rect class="box" x="0" y="0" width="200" height="80" rx="6"/>
+    <text class="label" x="100" y="32" text-anchor="middle">deploy-azure CLI</text>
+    <text class="sublabel" x="100" y="52" text-anchor="middle">Python · stdlib only</text>
+  </g>
+
+  <g transform="translate(480,140)">
+    <rect class="boxDeep" x="0" y="0" width="220" height="80" rx="6"/>
+    <text class="label" x="110" y="32" text-anchor="middle">ARM REST API</text>
+    <text class="sublabel" x="110" y="52" text-anchor="middle">Microsoft.App · 2025-10-02-preview</text>
+  </g>
+
+  <path class="arrow" d="M200,180 L240,180"/>
+  <path class="arrow" d="M440,180 L480,180"/>
+
+  <rect x="40" y="270" width="1120" height="340" rx="8" fill="#252525" stroke="#3B3B3B" stroke-width="1.5"/>
+  <text class="sublabel" x="60" y="290">Resource Group · rg-{project} · westeurope</text>
+
+  <rect class="flexBox" x="80" y="320" width="540" height="240" rx="6"/>
+  <text class="callout" x="100" y="345">Managed Environment · workloadProfileType = "Flex"</text>
+
+  <g transform="translate(110,375)">
+    <rect class="box" x="0" y="0" width="220" height="110" rx="6"/>
+    <text class="label" x="110" y="35" text-anchor="middle">Container Apps</text>
+    <text class="label" x="110" y="55" text-anchor="middle">(Flex profile)</text>
+    <text class="sublabel" x="110" y="78" text-anchor="middle">FastAPI · 0.5 vCPU / 2Gi</text>
+    <text class="sublabel" x="110" y="94" text-anchor="middle">minReplicas ≥ 1</text>
+  </g>
+
+  <g transform="translate(370,375)">
+    <rect class="box" x="0" y="0" width="220" height="110" rx="6"/>
+    <text class="label" x="110" y="35" text-anchor="middle">Container Registry</text>
+    <text class="sublabel" x="110" y="58" text-anchor="middle">Basic SKU</text>
+    <text class="sublabel" x="110" y="76" text-anchor="middle">{project}:latest</text>
+  </g>
+
+  <text class="callout" x="100" y="540">0.25–32 vCPU · per-second billing · sub-second cold starts</text>
+
+  <g transform="translate(680,375)">
+    <rect class="box" x="0" y="0" width="200" height="110" rx="6"/>
+    <text class="label" x="100" y="35" text-anchor="middle">Static Web Apps</text>
+    <text class="sublabel" x="100" y="58" text-anchor="middle">Next.js 14</text>
+    <text class="sublabel" x="100" y="76" text-anchor="middle">Free SKU · global CDN</text>
+  </g>
+
+  <g transform="translate(920,375)">
+    <rect class="box" x="0" y="0" width="200" height="110" rx="6"/>
+    <text class="label" x="100" y="35" text-anchor="middle">Postgres Flexible</text>
+    <text class="sublabel" x="100" y="58" text-anchor="middle">Standard_B1ms</text>
+    <text class="sublabel" x="100" y="76" text-anchor="middle">v16 · TLS-only</text>
+  </g>
+
+  <g transform="translate(1000,140)">
+    <rect class="boxDeep" x="0" y="0" width="160" height="80" rx="6"/>
+    <text class="label" x="80" y="32" text-anchor="middle">End user</text>
+    <text class="sublabel" x="80" y="52" text-anchor="middle">https://your-app.dev</text>
+  </g>
+
+  <path class="arrowDim" d="M590,220 L590,320"/>
+  <path class="arrowDim" d="M590,220 L780,375"/>
+  <path class="arrowDim" d="M590,220 L1020,375"/>
+
+  <path class="arrow" d="M1080,220 L780,375"/>
+  <path class="arrow" d="M780,430 L330,430"/>
+
+  <g transform="translate(40,640)">
+    <line x1="0" y1="10" x2="40" y2="10" stroke="#50E6FF" stroke-width="1.5"/>
+    <text class="legendText" x="48" y="14">runtime data flow</text>
+    <line x1="200" y1="10" x2="240" y2="10" stroke="#8A8886" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text class="legendText" x="248" y="14">control plane (ARM provisioning)</text>
+    <rect x="460" y="2" width="18" height="14" class="flexBox"/>
+    <text class="legendText" x="486" y="14">Flex workload profile boundary</text>
+    <text class="legendText" x="900" y="14">© 2026 · MIT · community-built</text>
+  </g>
+</svg>

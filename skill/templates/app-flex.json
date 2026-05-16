@@ -1,0 +1,41 @@
+{
+  "location": "westeurope",
+  "properties": {
+    "environmentId": "/subscriptions/{SUB_ID}/resourceGroups/{RG}/providers/Microsoft.App/managedEnvironments/{ENV_NAME}",
+    "workloadProfileName": "Flex",
+    "configuration": {
+      "ingress": {
+        "external": true,
+        "targetPort": 8000,
+        "transport": "auto"
+      },
+      "registries": [
+        {
+          "server": "{ACR_NAME}.azurecr.io",
+          "username": "{ACR_USER}",
+          "passwordSecretRef": "registry-password"
+        }
+      ],
+      "secrets": [
+        { "name": "registry-password", "value": "{ACR_PASSWORD}" },
+        { "name": "database-url",      "value": "{DB_CONN_STRING}" }
+      ]
+    },
+    "template": {
+      "containers": [
+        {
+          "name": "{APP_NAME}",
+          "image": "{ACR_NAME}.azurecr.io/{PROJECT}:latest",
+          "resources": { "cpu": 0.5, "memory": "2Gi" },
+          "env": [
+            { "name": "DATABASE_URL", "secretRef": "database-url" }
+          ]
+        }
+      ],
+      "scale": {
+        "minReplicas": 1,
+        "maxReplicas": 10
+      }
+    }
+  }
+}

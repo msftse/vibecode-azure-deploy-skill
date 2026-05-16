@@ -1,0 +1,939 @@
+#!/usr/bin/env python3
+"""deploy-azure — Vercel-like one-command deploys to Azure.
+
+Stack: Static Web Apps (frontend) + Container Apps on the **Flex** workload
+profile (backend) + Postgres Flexible Server (data). One azure.toml, idempotent.
+
+The Flex workload profile is the new "Container Apps Express" SKU. As of
+az CLI 2.85 it is not yet exposed as a friendly flag, so the Flex code path
+shells out to `az rest` and PUTs raw ARM bodies against the
+`Microsoft.App/managedEnvironments` and `Microsoft.App/containerApps`
+providers (api-version 2025-10-02-preview).
+
+Stdlib only.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import subprocess
+import sys
+import secrets
+import string
+import time
+from pathlib import Path
+from typing import Any, Optional
+
+try:
+    import tomllib  # py3.11+
+except ImportError:
+    # Re-exec under a newer python if available — keeps us stdlib-only.
+    import shutil
+    for cand in ("python3.13", "python3.12", "python3.11"):
+        path = shutil.which(cand)
+        if path:
+            os.execv(path, [path, __file__, *sys.argv[1:]])
+    print("ERROR: Python 3.11+ required (tomllib not available, and no "
+          "python3.11/3.12/3.13 found on PATH).", file=sys.stderr)
+    sys.exit(2)
+
+
+# ---------------------------------------------------------------------------
+# constants
+# ---------------------------------------------------------------------------
+
+ARM_API_VERSION = "2025-10-02-preview"
+
+# Flex workload profile: the only CPU/memory pairs Azure will accept.
+# Anything else → ContainerAppInvalidResourceTotal.
+FLEX_RESOURCE_PAIRS: list[tuple[float, str]] = [
+    (0.25, "1Gi"),
+    (0.5, "2Gi"),
+    (1.0, "4Gi"),
+    (2.0, "8Gi"),
+    (4.0, "16Gi"),
+    (8.0, "32Gi"),
+    (16.0, "64Gi"),
+    (32.0, "128Gi"),
+]
+
+FLEX_REGIONS = {"westeurope", "eastus", "eastus2"}
+
+
+# ---------------------------------------------------------------------------
+# helpers
+# ---------------------------------------------------------------------------
+
+def info(msg: str) -> None:
+    print(f"\033[36m→\033[0m {msg}")
+
+def ok(msg: str) -> None:
+    print(f"\033[32m✓\033[0m {msg}")
+
+def warn(msg: str) -> None:
+    print(f"\033[33m!\033[0m {msg}", file=sys.stderr)
+
+def err(msg: str) -> None:
+    print(f"\033[31m✗\033[0m {msg}", file=sys.stderr)
+
+
+def run(cmd: list[str], check: bool = True, capture: bool = False,
+        env: Optional[dict] = None) -> subprocess.CompletedProcess:
+    if not capture:
+        info("$ " + " ".join(cmd))
+    try:
+        return subprocess.run(
+            cmd,
+            check=check,
+            capture_output=capture,
+            text=True,
+            env={**os.environ, **(env or {})},
+        )
+    except FileNotFoundError:
+        err(f"Command not found: {cmd[0]}. Is it installed and on PATH?")
+        sys.exit(127)
+    except subprocess.CalledProcessError as e:
+        if capture:
+            err(e.stderr or e.stdout or str(e))
+        raise
+
+
+def az_json(args: list[str]) -> Any:
+    cp = run(["az", *args, "-o", "json"], check=False, capture=True)
+    if cp.returncode != 0:
+        return None
+    try:
+        return json.loads(cp.stdout) if cp.stdout.strip() else None
+    except json.JSONDecodeError:
+        return None
+
+
+def az_rest(method: str, url: str, body: Optional[dict] = None) -> Any:
+    """Invoke an ARM REST call via `az rest` and return parsed JSON."""
+    args = ["az", "rest", "--method", method, "--url", url]
+    tmp = None
+    if body is not None:
+        import tempfile
+        tmp = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False)
+        json.dump(body, tmp)
+        tmp.flush()
+        tmp.close()
+        args += ["--body", f"@{tmp.name}",
+                 "--headers", "Content-Type=application/json"]
+    try:
+        cp = run(args, check=False, capture=True)
+    finally:
+        if tmp:
+            try:
+                os.unlink(tmp.name)
+            except OSError:
+                pass
+    if cp.returncode != 0:
+        err(f"ARM REST {method} {url} failed:\n{cp.stderr or cp.stdout}")
+        sys.exit(1)
+    if not cp.stdout.strip():
+        return None
+    try:
+        return json.loads(cp.stdout)
+    except json.JSONDecodeError:
+        return cp.stdout
+
+
+def random_suffix(n: int = 4) -> str:
+    return "".join(secrets.choice(string.hexdigits.lower()) for _ in range(n))
+
+
+def random_password(n: int = 24) -> str:
+    alphabet = string.ascii_letters + string.digits + "-_"
+    pw = [
+        secrets.choice(string.ascii_lowercase),
+        secrets.choice(string.ascii_uppercase),
+        secrets.choice(string.digits),
+        secrets.choice("-_"),
+    ]
+    pw += [secrets.choice(alphabet) for _ in range(n - 4)]
+    secrets.SystemRandom().shuffle(pw)
+    return "".join(pw)
+
+
+def validate_flex_resources(cpu: float, memory: str) -> None:
+    pair = (float(cpu), str(memory))
+    for c, m in FLEX_RESOURCE_PAIRS:
+        if abs(c - pair[0]) < 1e-9 and m == pair[1]:
+            return
+    err(f"Invalid Flex CPU/memory combo: {cpu} / {memory}")
+    err("Flex requires one of these exact pairs:")
+    for c, m in FLEX_RESOURCE_PAIRS:
+        err(f"  cpu={c}  memory={m}")
+    sys.exit(2)
+
+
+# ---------------------------------------------------------------------------
+# auth
+# ---------------------------------------------------------------------------
+
+SP_ENVS = ("AZURE_CLIENT_ID", "AZURE_CLIENT_SECRET",
+           "AZURE_TENANT_ID", "AZURE_SUBSCRIPTION_ID")
+
+
+def ensure_auth() -> None:
+    if all(os.environ.get(k) for k in SP_ENVS):
+        info("Service principal env vars detected; logging in.")
+        run(["az", "login", "--service-principal",
+             "-u", os.environ["AZURE_CLIENT_ID"],
+             "-p", os.environ["AZURE_CLIENT_SECRET"],
+             "--tenant", os.environ["AZURE_TENANT_ID"]],
+            capture=True)
+        run(["az", "account", "set", "--subscription",
+             os.environ["AZURE_SUBSCRIPTION_ID"]], capture=True)
+        ok("Authenticated via service principal.")
+        return
+    cp = run(["az", "account", "show"], check=False, capture=True)
+    if cp.returncode == 0:
+        ok("Using existing `az` login context.")
+        return
+    err("Not logged in to Azure. Run `az login`.")
+    sys.exit(2)
+
+
+def current_subscription_id() -> str:
+    data = az_json(["account", "show"])
+    if not data or "id" not in data:
+        err("Could not determine current subscription. Run `az login`.")
+        sys.exit(2)
+    return data["id"]
+
+
+# ---------------------------------------------------------------------------
+# config
+# ---------------------------------------------------------------------------
+
+CONFIG_PATH = Path("azure.toml")
+
+
+class Config:
+    def __init__(self, data: dict) -> None:
+        self.data = data
+
+    @classmethod
+    def load(cls, path: Path = CONFIG_PATH) -> "Config":
+        if not path.exists():
+            err(f"No {path} found. Run `deploy-azure init` first.")
+            sys.exit(2)
+        with path.open("rb") as f:
+            return cls(tomllib.load(f))
+
+    @property
+    def project(self) -> str:
+        return self.data["project"]["name"]
+
+    @property
+    def region(self) -> str:
+        return self.data["project"].get("region", "westeurope")
+
+    @property
+    def rg(self) -> str:
+        return self.data["project"].get("resource_group", f"rg-{self.project}")
+
+    @property
+    def backend(self) -> Optional[dict]:
+        return self.data.get("backend")
+
+    @property
+    def frontend(self) -> Optional[dict]:
+        return self.data.get("frontend")
+
+    @property
+    def db(self) -> Optional[dict]:
+        return self.data.get("db")
+
+    @property
+    def domain(self) -> Optional[dict]:
+        return self.data.get("domain")
+
+    def save(self, path: Path = CONFIG_PATH) -> None:
+        path.write_text(self._render())
+
+    def _render(self) -> str:
+        d = self.data
+        lines = ["# azure.toml — managed by deploy-azure (edits preserved)", ""]
+        lines.append("[project]")
+        for k in ("name", "region", "resource_group"):
+            if k in d.get("project", {}):
+                lines.append(f'{k} = "{d["project"][k]}"')
+        lines.append("")
+        for section in ("backend", "frontend", "db", "domain"):
+            if section in d:
+                lines.append(f"[{section}]")
+                for k, v in d[section].items():
+                    if isinstance(v, bool):
+                        lines.append(f"{k} = {str(v).lower()}")
+                    elif isinstance(v, (int, float)) and not isinstance(v, bool):
+                        lines.append(f"{k} = {v}")
+                    else:
+                        s = str(v).replace("\\", "\\\\").replace('"', '\\"')
+                        lines.append(f'{k} = "{s}"')
+                lines.append("")
+        return "\n".join(lines).rstrip() + "\n"
+
+
+# ---------------------------------------------------------------------------
+# detection
+# ---------------------------------------------------------------------------
+
+def detect_stack(root: Path) -> dict:
+    backend = None
+    frontend = None
+
+    dockerfiles = sorted(root.rglob("Dockerfile"), key=lambda p: len(p.parts))
+    dockerfiles = [p for p in dockerfiles
+                   if "node_modules" not in p.parts and ".git" not in p.parts]
+    if dockerfiles:
+        df = dockerfiles[0]
+        backend = {
+            "path": str(df.parent.relative_to(root)) or ".",
+            "port": _sniff_port(df) or 8000,
+        }
+
+    for cfg in ("next.config.js", "next.config.mjs", "next.config.ts"):
+        for p in root.rglob(cfg):
+            if "node_modules" in p.parts:
+                continue
+            frontend = {
+                "path": str(p.parent.relative_to(root)) or ".",
+                "framework": "next",
+            }
+            break
+        if frontend:
+            break
+
+    if not frontend:
+        for pj in root.rglob("package.json"):
+            if "node_modules" in pj.parts:
+                continue
+            try:
+                data = json.loads(pj.read_text())
+            except Exception:
+                continue
+            deps = {**data.get("dependencies", {}),
+                    **data.get("devDependencies", {})}
+            if "next" in deps:
+                frontend = {"path": str(pj.parent.relative_to(root)) or ".",
+                            "framework": "next"}
+                break
+            if any(k in deps for k in ("astro", "@sveltejs/kit", "vite")):
+                frontend = {"path": str(pj.parent.relative_to(root)) or ".",
+                            "framework": "static"}
+
+    return {"backend": backend, "frontend": frontend}
+
+
+def _sniff_port(dockerfile: Path) -> Optional[int]:
+    try:
+        for line in dockerfile.read_text().splitlines():
+            m = re.match(r"\s*EXPOSE\s+(\d+)", line, re.IGNORECASE)
+            if m:
+                return int(m.group(1))
+    except Exception:
+        pass
+    return None
+
+
+# ---------------------------------------------------------------------------
+# init
+# ---------------------------------------------------------------------------
+
+def cmd_init(args: argparse.Namespace) -> int:
+    root = Path.cwd()
+    name = args.name or root.name
+    name = re.sub(r"[^a-z0-9-]", "-", name.lower()).strip("-") or "app"
+    region = args.region or "westeurope"
+
+    detected = detect_stack(root)
+    if not detected["backend"] and not detected["frontend"]:
+        err("Could not detect a backend (Dockerfile) or frontend (Next/Astro/"
+            "SvelteKit/Vite). Add one, or pass --name to scaffold anyway.")
+        return 2
+
+    profile = args.profile
+    cfg_data: dict = {
+        "project": {
+            "name": name,
+            "region": region,
+            "resource_group": f"rg-{name}",
+        }
+    }
+    if detected["backend"]:
+        b = detected["backend"]
+        backend_cfg = {
+            "path": b["path"],
+            "port": b["port"],
+            "app_name": f"ca-{name}",
+            "acr_name": f"{re.sub(r'[^a-z0-9]', '', name)}acr",
+            "profile": profile,
+            "cpu": 0.5,
+            "memory": "2Gi",
+            # Flex requires min_replicas >= 1 in preview (no scale-to-zero yet).
+            # Consumption can scale to zero.
+            "min_replicas": 1 if profile == "flex" else 0,
+            "max_replicas": 10,
+        }
+        cfg_data["backend"] = backend_cfg
+    if detected["frontend"]:
+        f = detected["frontend"]
+        cfg_data["frontend"] = {
+            "path": f["path"],
+            "framework": f["framework"],
+            "swa_name": f"swa-{name}",
+        }
+
+    stack = ("fullstack" if detected["backend"] and detected["frontend"]
+             else "backend" if detected["backend"] else "frontend")
+    info(f"Detected stack: {stack}  (profile: {profile})")
+
+    cfg = Config(cfg_data)
+    if args.dry_run:
+        print("--- azure.toml (dry-run, not written) ---")
+        print(cfg._render())
+        return 0
+    if CONFIG_PATH.exists() and not args.force:
+        err(f"{CONFIG_PATH} already exists. Use --force to overwrite.")
+        return 1
+    cfg.save()
+    ok(f"Wrote {CONFIG_PATH}.")
+    print()
+    print("Next steps:")
+    print("  deploy-azure db add postgres    # optional")
+    print("  deploy-azure up                 # deploy")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# up
+# ---------------------------------------------------------------------------
+
+def cmd_up(args: argparse.Namespace) -> int:
+    cfg = Config.load()
+    ensure_auth()
+
+    # Profile precedence: CLI flag > config > "flex".
+    profile = args.profile or (cfg.backend or {}).get("profile") or "flex"
+    if profile not in ("flex", "consumption"):
+        err(f"Unknown profile: {profile}. Use 'flex' or 'consumption'.")
+        return 2
+    if profile == "flex" and cfg.region not in FLEX_REGIONS:
+        warn(f"Region {cfg.region} is not in the known Flex region list "
+             f"({sorted(FLEX_REGIONS)}). Continuing — Microsoft may have "
+             f"expanded availability.")
+
+    start = time.time()
+
+    info(f"Ensuring resource group {cfg.rg} in {cfg.region}…")
+    run(["az", "group", "create", "-n", cfg.rg, "-l", cfg.region], capture=True)
+    ok("Resource group ready.")
+
+    backend_url = None
+    frontend_url = None
+
+    if cfg.backend:
+        backend_url = _ensure_backend(cfg, profile)
+
+    if cfg.frontend:
+        frontend_url = _ensure_frontend(cfg, backend_url)
+
+    elapsed = time.time() - start
+    print()
+    _print_banner(profile, elapsed, backend_url, frontend_url)
+    return 0
+
+
+def _print_banner(profile: str, elapsed: float,
+                  backend_url: Optional[str], frontend_url: Optional[str]) -> None:
+    line = "═" * 62
+    print(f"\033[36m{line}\033[0m")
+    print(f"  \033[1m✓ Deploy complete\033[0m  ({elapsed:.1f}s)")
+    if backend_url:
+        print(f"  backend  : https://{backend_url}")
+    if frontend_url:
+        print(f"  frontend : https://{frontend_url}")
+    print(f"  profile  : {profile}")
+    print(f"  powered by: Azure Container Apps · ARM api {ARM_API_VERSION}")
+    print(f"\033[36m{line}\033[0m")
+
+
+# ---------------------------------------------------------------------------
+# backend — Flex (ARM REST) and Consumption (az CLI) paths
+# ---------------------------------------------------------------------------
+
+def _ensure_acr_and_image(cfg: Config) -> tuple[str, str, str, str]:
+    """Ensure ACR exists, build+push image. Returns (acr, image, user, pw)."""
+    b = cfg.backend
+    acr = b["acr_name"]
+
+    info(f"Ensuring ACR {acr}…")
+    existing = az_json(["acr", "show", "-n", acr])
+    if not existing:
+        cp = run(["az", "acr", "create", "-g", cfg.rg, "-n", acr,
+                  "--sku", "Basic", "--admin-enabled", "true"],
+                 check=False, capture=True)
+        if cp.returncode != 0:
+            txt = (cp.stderr or "").lower()
+            if "already" in txt or "taken" in txt:
+                acr = f"{acr}{random_suffix()}"
+                warn(f"ACR name collision; retrying with {acr}.")
+                b["acr_name"] = acr
+                cfg.save()
+                run(["az", "acr", "create", "-g", cfg.rg, "-n", acr,
+                     "--sku", "Basic", "--admin-enabled", "true"], capture=True)
+            else:
+                err(cp.stderr)
+                sys.exit(1)
+    ok(f"ACR {acr} ready.")
+
+    image = f"{acr}.azurecr.io/{cfg.project}:latest"
+    info("Logging in to ACR…")
+    run(["az", "acr", "login", "-n", acr], capture=True)
+    info(f"Building image {image} (linux/amd64)…")
+    run(["docker", "build", "--platform", "linux/amd64", "-t", image, b["path"]])
+    info("Pushing image…")
+    run(["docker", "push", image])
+    ok("Image pushed.")
+
+    cred = az_json(["acr", "credential", "show", "-n", acr])
+    return acr, image, cred["username"], cred["passwords"][0]["value"]
+
+
+def _ensure_backend(cfg: Config, profile: str) -> Optional[str]:
+    b = cfg.backend
+    cpu = float(b.get("cpu", 0.5))
+    memory = str(b.get("memory", "2Gi"))
+    if profile == "flex":
+        validate_flex_resources(cpu, memory)
+
+    acr, image, reg_user, reg_pw = _ensure_acr_and_image(cfg)
+    env_name = f"cae-{cfg.project}"
+    app = b["app_name"]
+    port = int(b.get("port", 8000))
+    min_replicas = int(b.get("min_replicas", 1 if profile == "flex" else 0))
+    max_replicas = int(b.get("max_replicas", 10))
+
+    if profile == "flex":
+        return _flex_deploy(cfg, env_name, app, image, port,
+                            reg_user, reg_pw, cpu, memory,
+                            min_replicas, max_replicas)
+    return _consumption_deploy(cfg, env_name, app, image, port,
+                               reg_user, reg_pw, acr, cpu, memory,
+                               min_replicas, max_replicas)
+
+
+# --- Flex (ARM REST) ---------------------------------------------------------
+
+def _arm_env_url(sub: str, rg: str, name: str) -> str:
+    return (f"https://management.azure.com/subscriptions/{sub}"
+            f"/resourceGroups/{rg}/providers/Microsoft.App/managedEnvironments"
+            f"/{name}?api-version={ARM_API_VERSION}")
+
+
+def _arm_app_url(sub: str, rg: str, name: str) -> str:
+    return (f"https://management.azure.com/subscriptions/{sub}"
+            f"/resourceGroups/{rg}/providers/Microsoft.App/containerApps"
+            f"/{name}?api-version={ARM_API_VERSION}")
+
+
+def _poll_provisioning(get_url: str, label: str,
+                       timeout_s: int = 480) -> dict:
+    """Poll an ARM resource until provisioningState is terminal or timeout."""
+    info(f"Waiting for {label} to provision (up to {timeout_s}s)…")
+    delay = 4.0
+    deadline = time.time() + timeout_s
+    sys.stdout.write("  ")
+    sys.stdout.flush()
+    while time.time() < deadline:
+        cur = az_rest("GET", get_url) or {}
+        state = (cur.get("properties") or {}).get("provisioningState", "Unknown")
+        sys.stdout.write(".")
+        sys.stdout.flush()
+        if state in ("Succeeded",):
+            sys.stdout.write(f" {state}\n")
+            return cur
+        if state in ("Failed", "Canceled"):
+            sys.stdout.write(f" {state}\n")
+            err(f"{label} entered terminal state {state}.")
+            sys.exit(1)
+        time.sleep(delay)
+        delay = min(delay * 1.5, 20.0)
+    sys.stdout.write(" timeout\n")
+    err(f"{label} did not finish within {timeout_s}s.")
+    sys.exit(1)
+
+
+def _flex_deploy(cfg: Config, env_name: str, app: str, image: str, port: int,
+                 reg_user: str, reg_pw: str, cpu: float, memory: str,
+                 min_replicas: int, max_replicas: int) -> Optional[str]:
+    sub = current_subscription_id()
+
+    # 1. Managed environment with workloadProfileType=Flex
+    env_url = _arm_env_url(sub, cfg.rg, env_name)
+    existing_env = az_rest("GET", env_url)
+    if not existing_env or (existing_env.get("properties", {})
+                            .get("provisioningState") not in ("Succeeded",)):
+        info(f"Creating Flex managed environment {env_name} (~3 min)…")
+        env_body = {
+            "location": cfg.region,
+            "properties": {
+                "workloadProfiles": [
+                    {"name": "Flex", "workloadProfileType": "Flex"},
+                ],
+            },
+        }
+        az_rest("PUT", env_url, env_body)
+        _poll_provisioning(env_url, f"managed env {env_name}", timeout_s=480)
+    ok(f"Managed env {env_name} ready (Flex profile).")
+
+    if min_replicas < 1:
+        warn("Flex preview requires minReplicas ≥ 1; bumping to 1.")
+        min_replicas = 1
+
+    # 2. Container app on the Flex workload profile
+    app_url = _arm_app_url(sub, cfg.rg, app)
+    env_arm_id = (f"/subscriptions/{sub}/resourceGroups/{cfg.rg}"
+                  f"/providers/Microsoft.App/managedEnvironments/{env_name}")
+    env_vars: list[dict] = []
+    secrets_list: list[dict] = []
+    if cfg.db and cfg.db.get("connection_string"):
+        secrets_list.append({"name": "database-url",
+                             "value": cfg.db["connection_string"]})
+        env_vars.append({"name": "DATABASE_URL",
+                         "secretRef": "database-url"})
+    secrets_list.append({"name": "registry-password", "value": reg_pw})
+
+    acr_server = image.split("/")[0]
+    app_body = {
+        "location": cfg.region,
+        "properties": {
+            "environmentId": env_arm_id,
+            "workloadProfileName": "Flex",
+            "configuration": {
+                "ingress": {
+                    "external": True,
+                    "targetPort": port,
+                    "transport": "auto",
+                },
+                "registries": [{
+                    "server": acr_server,
+                    "username": reg_user,
+                    "passwordSecretRef": "registry-password",
+                }],
+                "secrets": secrets_list,
+            },
+            "template": {
+                "containers": [{
+                    "name": app,
+                    "image": image,
+                    "resources": {"cpu": cpu, "memory": memory},
+                    "env": env_vars,
+                }],
+                "scale": {
+                    "minReplicas": min_replicas,
+                    "maxReplicas": max_replicas,
+                },
+            },
+        },
+    }
+    info(f"Deploying Flex container app {app} (~30s)…")
+    az_rest("PUT", app_url, app_body)
+    final = _poll_provisioning(app_url, f"container app {app}", timeout_s=180)
+    fqdn = (((final or {}).get("properties") or {})
+            .get("configuration", {}).get("ingress", {}).get("fqdn"))
+    ok(f"Container App {app} ready.")
+    return fqdn
+
+
+# --- Consumption (az CLI) ----------------------------------------------------
+
+def _consumption_deploy(cfg: Config, env_name: str, app: str, image: str,
+                        port: int, reg_user: str, reg_pw: str, acr: str,
+                        cpu: float, memory: str,
+                        min_replicas: int, max_replicas: int) -> Optional[str]:
+    info(f"Ensuring Consumption Container Apps environment {env_name}…")
+    if not az_json(["containerapp", "env", "show", "-g", cfg.rg, "-n", env_name]):
+        run(["az", "containerapp", "env", "create",
+             "-g", cfg.rg, "-n", env_name, "-l", cfg.region], capture=True)
+    ok(f"ACA env {env_name} ready.")
+
+    secrets_args: list[str] = []
+    env_args: list[str] = []
+    if cfg.db and cfg.db.get("connection_string"):
+        secrets_args = ["--secrets", f"database-url={cfg.db['connection_string']}"]
+        env_args = ["--env-vars", "DATABASE_URL=secretref:database-url"]
+
+    existing = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app])
+    if not existing:
+        create_cmd = [
+            "az", "containerapp", "create",
+            "-g", cfg.rg, "-n", app,
+            "--environment", env_name,
+            "--image", image,
+            "--target-port", str(port),
+            "--ingress", "external",
+            "--registry-server", f"{acr}.azurecr.io",
+            "--registry-username", reg_user,
+            "--registry-password", reg_pw,
+            "--cpu", str(cpu),
+            "--memory", memory,
+            "--min-replicas", str(min_replicas),
+            "--max-replicas", str(max_replicas),
+        ] + secrets_args + env_args
+        run(create_cmd, capture=True)
+    else:
+        info(f"Updating Container App {app}…")
+        update_cmd = ["az", "containerapp", "update",
+                      "-g", cfg.rg, "-n", app, "--image", image]
+        if env_args:
+            update_cmd += env_args
+        run(update_cmd, capture=True)
+        if secrets_args:
+            run(["az", "containerapp", "secret", "set",
+                 "-g", cfg.rg, "-n", app] + secrets_args, capture=True)
+    ok(f"Container App {app} ready.")
+
+    fqdn = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app,
+                    "--query", "properties.configuration.ingress.fqdn"])
+    return fqdn if isinstance(fqdn, str) else None
+
+
+# ---------------------------------------------------------------------------
+# frontend
+# ---------------------------------------------------------------------------
+
+def _ensure_frontend(cfg: Config, backend_url: Optional[str]) -> Optional[str]:
+    f = cfg.frontend
+    swa = f["swa_name"]
+    info(f"Ensuring Static Web App {swa}…")
+    existing = az_json(["staticwebapp", "show", "-g", cfg.rg, "-n", swa])
+    if not existing:
+        cp = run(["az", "staticwebapp", "create",
+                  "-g", cfg.rg, "-n", swa, "-l", cfg.region,
+                  "--sku", "Free"], check=False, capture=True)
+        if cp.returncode != 0:
+            err(cp.stderr)
+            warn("SWA creation failed; you may need --source with a GitHub repo.")
+            return None
+    ok(f"SWA {swa} ready.")
+
+    if backend_url:
+        info("Injecting NEXT_PUBLIC_BACKEND_URL into SWA app settings…")
+        run(["az", "staticwebapp", "appsettings", "set",
+             "-n", swa, "--setting-names",
+             f"NEXT_PUBLIC_BACKEND_URL=https://{backend_url}"],
+            check=False, capture=True)
+
+    host = az_json(["staticwebapp", "show", "-g", cfg.rg, "-n", swa,
+                    "--query", "defaultHostname"])
+    return host if isinstance(host, str) else None
+
+
+# ---------------------------------------------------------------------------
+# db / domain / logs / status / destroy
+# ---------------------------------------------------------------------------
+
+def cmd_db_add(args: argparse.Namespace) -> int:
+    cfg = Config.load()
+    ensure_auth()
+    run(["az", "group", "create", "-n", cfg.rg, "-l", cfg.region], capture=True)
+    if args.kind == "postgres":
+        return _add_postgres(cfg)
+    err(f"Unknown db kind: {args.kind}")
+    return 2
+
+
+def _add_postgres(cfg: Config) -> int:
+    server = f"pg-{cfg.project}-{random_suffix()}"
+    admin = "azureadmin"
+    pw = random_password()
+    info(f"Creating Postgres Flexible Server {server} (3-5 min)…")
+    run(["az", "postgres", "flexible-server", "create",
+         "-g", cfg.rg, "-n", server, "-l", cfg.region,
+         "--admin-user", admin, "--admin-password", pw,
+         "--tier", "Burstable", "--sku-name", "Standard_B1ms",
+         "--storage-size", "32", "--version", "16",
+         "--public-access", "0.0.0.0", "--yes"], capture=True)
+    db_name = re.sub(r"[^a-z0-9_]", "_", cfg.project.lower())
+    run(["az", "postgres", "flexible-server", "db", "create",
+         "-g", cfg.rg, "-s", server, "-d", db_name], capture=True)
+    conn = (f"postgresql://{admin}:{pw}@{server}.postgres.database.azure.com:"
+            f"5432/{db_name}?sslmode=require")
+    cfg.data["db"] = {
+        "kind": "postgres",
+        "server": server,
+        "database": db_name,
+        "admin_user": admin,
+        "admin_password": pw,
+        "connection_string": conn,
+    }
+    cfg.save()
+    ok("Postgres ready. azure.toml updated. Run `deploy-azure up` to wire it.")
+    return 0
+
+
+def cmd_domain_add(args: argparse.Namespace) -> int:
+    cfg = Config.load()
+    ensure_auth()
+    host = args.hostname
+    target = "frontend" if cfg.frontend else "backend"
+    if target == "frontend":
+        swa = cfg.frontend["swa_name"]
+        info(f"Binding {host} → SWA {swa}. DNS must already CNAME to the SWA "
+             f"default hostname.")
+        cp = run(["az", "staticwebapp", "hostname", "set",
+                  "-n", swa, "--hostname", host], check=False, capture=True)
+        if cp.returncode != 0:
+            err(cp.stderr)
+            default = az_json(["staticwebapp", "show", "-g", cfg.rg,
+                               "-n", swa, "--query", "defaultHostname"])
+            print(f"\nAdd this DNS record then re-run:")
+            print(f"  CNAME  {host}  →  {default}")
+            return 1
+    else:
+        app = cfg.backend["app_name"]
+        info(f"Binding {host} → ACA {app}.")
+        run(["az", "containerapp", "hostname", "add",
+             "-g", cfg.rg, "-n", app, "--hostname", host], capture=True)
+        run(["az", "containerapp", "hostname", "bind",
+             "-g", cfg.rg, "-n", app, "--hostname", host,
+             "--environment", f"cae-{cfg.project}",
+             "--validation-method", "CNAME"], capture=True)
+    cfg.data["domain"] = {"hostname": host, "target": target}
+    cfg.save()
+    ok(f"Domain {host} bound to {target}.")
+    return 0
+
+
+def cmd_logs(args: argparse.Namespace) -> int:
+    cfg = Config.load()
+    ensure_auth()
+    if args.frontend:
+        warn("SWA streaming logs are not available via CLI; opening portal.")
+        return 0
+    if not cfg.backend:
+        err("No backend configured.")
+        return 2
+    app = cfg.backend["app_name"]
+    cmd = ["az", "containerapp", "logs", "show", "-g", cfg.rg, "-n", app]
+    if args.tail:
+        cmd += ["--follow", "true", "--tail", "100"]
+    run(cmd)
+    return 0
+
+
+def cmd_status(args: argparse.Namespace) -> int:
+    cfg = Config.load()
+    ensure_auth()
+    print(f"Project       : {cfg.project}")
+    print(f"Region        : {cfg.region}")
+    print(f"Resource group: {cfg.rg}")
+    print(f"Profile       : {(cfg.backend or {}).get('profile', 'n/a')}")
+    print()
+    if cfg.backend:
+        app = cfg.backend["app_name"]
+        fqdn = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app,
+                        "--query", "properties.configuration.ingress.fqdn"])
+        print(f"Backend  ({app}): https://{fqdn}" if fqdn
+              else f"Backend  ({app}): (not deployed yet)")
+    if cfg.frontend:
+        swa = cfg.frontend["swa_name"]
+        host = az_json(["staticwebapp", "show", "-g", cfg.rg, "-n", swa,
+                        "--query", "defaultHostname"])
+        print(f"Frontend ({swa}): https://{host}" if host
+              else f"Frontend ({swa}): (not deployed yet)")
+    if cfg.db:
+        print(f"DB            : {cfg.db['kind']} ({cfg.db.get('server')})")
+    print()
+    run(["az", "resource", "list", "-g", cfg.rg, "-o", "table"], check=False)
+    return 0
+
+
+def cmd_destroy(args: argparse.Namespace) -> int:
+    cfg = Config.load()
+    ensure_auth()
+    if not args.yes:
+        ans = input(f"Delete resource group {cfg.rg} and EVERYTHING in it? [y/N] ")
+        if ans.strip().lower() != "y":
+            print("Aborted.")
+            return 1
+    info(f"Deleting {cfg.rg}…")
+    run(["az", "group", "delete", "-n", cfg.rg, "--yes", "--no-wait"])
+    ok("Deletion initiated (runs in background).")
+    return 0
+
+
+# ---------------------------------------------------------------------------
+# argparse
+# ---------------------------------------------------------------------------
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="deploy-azure",
+        description="One-command fullstack deploys to Azure "
+                    "(Vercel-grade DX, powered by Container Apps Flex).",
+    )
+    sub = p.add_subparsers(dest="cmd", required=True, metavar="COMMAND")
+
+    p_init = sub.add_parser("init", help="Scan repo and write azure.toml.")
+    p_init.add_argument("--name")
+    p_init.add_argument("--region", default="westeurope")
+    p_init.add_argument("--profile", choices=["flex", "consumption"],
+                        default="flex",
+                        help="Container Apps workload profile (default: flex).")
+    p_init.add_argument("--dry-run", action="store_true")
+    p_init.add_argument("--force", action="store_true")
+    p_init.set_defaults(func=cmd_init)
+
+    p_up = sub.add_parser("up", help="Idempotent deploy (build, push, ensure).")
+    p_up.add_argument("--profile", choices=["flex", "consumption"], default=None,
+                      help="Override the profile from azure.toml.")
+    p_up.add_argument("--yes", action="store_true")
+    p_up.set_defaults(func=cmd_up)
+
+    p_db = sub.add_parser("db", help="Database management.")
+    db_sub = p_db.add_subparsers(dest="db_cmd", required=True)
+    p_db_add = db_sub.add_parser("add", help="Provision a DB.")
+    p_db_add.add_argument("kind", choices=["postgres"])
+    p_db_add.set_defaults(func=cmd_db_add)
+
+    p_dom = sub.add_parser("domain", help="Custom domain management.")
+    dom_sub = p_dom.add_subparsers(dest="dom_cmd", required=True)
+    p_dom_add = dom_sub.add_parser("add", help="Bind a custom hostname.")
+    p_dom_add.add_argument("hostname")
+    p_dom_add.set_defaults(func=cmd_domain_add)
+
+    p_logs = sub.add_parser("logs", help="Stream logs.")
+    p_logs.add_argument("--backend", action="store_true")
+    p_logs.add_argument("--frontend", action="store_true")
+    p_logs.add_argument("--tail", action="store_true")
+    p_logs.set_defaults(func=cmd_logs)
+
+    p_status = sub.add_parser("status", help="Show deployed resources + URLs.")
+    p_status.set_defaults(func=cmd_status)
+
+    p_destroy = sub.add_parser("destroy", help="Delete the resource group.")
+    p_destroy.add_argument("--yes", action="store_true")
+    p_destroy.set_defaults(func=cmd_destroy)
+
+    return p
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    try:
+        return args.func(args)
+    except KeyboardInterrupt:
+        print("\nInterrupted.", file=sys.stderr)
+        return 130
+
+
+if __name__ == "__main__":
+    sys.exit(main())

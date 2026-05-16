@@ -1,0 +1,23 @@
+[project]
+name = "hello-fullstack"
+region = "westeurope"
+resource_group = "rg-hello-fullstack"
+
+[backend]
+path = "backend"
+port = 8000
+app_name = "ca-hello-fullstack"
+acr_name = "hellofullstackacr"
+profile = "flex"
+cpu = 0.5
+memory = "2Gi"
+min_replicas = 1
+max_replicas = 10
+
+[frontend]
+path = "frontend"
+framework = "next"
+swa_name = "swa-hello-fullstack"
+
+[db]
+kind = "postgres"

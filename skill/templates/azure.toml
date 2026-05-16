@@ -1,0 +1,25 @@
+# azure.toml — managed by deploy-azure (edits preserved)
+
+[project]
+name = "my-app"
+region = "westeurope"
+resource_group = "rg-my-app"
+
+[backend]
+path = "backend"
+port = 8000
+app_name = "ca-my-app"
+acr_name = "myappacr"
+profile = "flex"            # "flex" (default) or "consumption"
+cpu = 0.5                   # Flex requires one of the exact pairs (see docs/flex-vs-consumption.md)
+memory = "2Gi"
+min_replicas = 1            # Flex preview requires ≥ 1; consumption can use 0
+max_replicas = 10
+
+[frontend]
+path = "frontend"
+framework = "next"
+swa_name = "swa-my-app"
+
+[db]
+kind = "postgres"
