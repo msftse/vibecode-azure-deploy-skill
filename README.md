@@ -6,6 +6,10 @@
 
 **A skill that lets AI coding agents ship full-stack apps to Azure with one command. Vercel-grade DX, powered by Azure Container Apps Express.**
 
+<img src="docs/assets/hero-to-build-or-not.jpg" alt="To build or not to build your startup idea" width="60%">
+
+*Stop deliberating. Ship it in 90 seconds and find out.*
+
 > **Built for agents.** This repo is optimized for AI agents (Claude Code, Codex, Cursor, Hermes, OpenCode) to consume as a tool. See [`AGENTS.md`](AGENTS.md) for the machine-readable contract: command shapes, exit codes, idempotency rules, and recovery patterns.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-0078D4.svg)](LICENSE)
