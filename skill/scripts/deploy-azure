@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import shutil
 import re
 import subprocess
 import sys
@@ -89,7 +90,8 @@ def err(msg: str) -> None:
 
 
 def run(cmd: list[str], check: bool = True, capture: bool = False,
-        env: Optional[dict] = None) -> subprocess.CompletedProcess:
+        env: Optional[dict] = None,
+        cwd: Optional[str] = None) -> subprocess.CompletedProcess:
     if not capture:
         info("$ " + " ".join(cmd))
     try:
@@ -99,6 +101,7 @@ def run(cmd: list[str], check: bool = True, capture: bool = False,
             capture_output=capture,
             text=True,
             env={**os.environ, **(env or {})},
+            cwd=cwd,
         )
     except FileNotFoundError:
         err(f"Command not found: {cmd[0]}. Is it installed and on PATH?")
@@ -937,6 +940,49 @@ def _ensure_frontend(cfg: Config, backend_url: Optional[str]) -> Optional[str]:
              "-n", swa, "--setting-names",
              f"NEXT_PUBLIC_BACKEND_URL=https://{backend_url}"],
             check=False, capture=True)
+
+    # Build + upload the frontend bundle when possible (Next.js static export).
+    fe_path = (Path.cwd() / f.get("path", "frontend")).resolve()
+    framework = f.get("framework", "next")
+    out_dir_name = f.get("out_dir", "out" if framework == "next" else "dist")
+    out_dir = fe_path / out_dir_name
+    if fe_path.exists() and (fe_path / "package.json").exists():
+        npm = shutil.which("npm")
+        swa_cli = shutil.which("swa")
+        if not npm:
+            warn("npm not on PATH; skipping frontend build. "
+                 "Bundle was NOT uploaded to SWA.")
+        elif not swa_cli:
+            warn("swa CLI not on PATH (`npm i -g @azure/static-web-apps-cli`); "
+                 "skipping bundle upload.")
+        else:
+            env = {}
+            if backend_url:
+                env["NEXT_PUBLIC_BACKEND_URL"] = f"https://{backend_url}"
+            if not (fe_path / "node_modules").exists():
+                info("Installing frontend deps (npm install)…")
+                run([npm, "install", "--silent", "--no-audit", "--no-fund"],
+                    cwd=str(fe_path), env=env, capture=True)
+            info(f"Building frontend ({framework})…")
+            run([npm, "run", "build"], cwd=str(fe_path), env=env, capture=True)
+            if not out_dir.exists():
+                warn(f"Build finished but {out_dir} missing; "
+                     "check next.config (need `output: 'export'`).")
+            else:
+                token_cp = run(["az", "staticwebapp", "secrets", "list",
+                                "-g", cfg.rg, "-n", swa,
+                                "--query", "properties.apiKey", "-o", "tsv"],
+                               capture=True, check=False)
+                token = (token_cp.stdout or "").strip()
+                if not token:
+                    warn("Could not fetch SWA deployment token; "
+                         "skipping bundle upload.")
+                else:
+                    info("Uploading bundle to SWA…")
+                    run([swa_cli, "deploy", str(out_dir),
+                         "--deployment-token", token, "--env", "production"],
+                        cwd=str(fe_path), capture=True)
+                    ok("Frontend bundle uploaded.")
 
     host = az_json(["staticwebapp", "show", "-g", cfg.rg, "-n", swa,
                     "--query", "defaultHostname"])
