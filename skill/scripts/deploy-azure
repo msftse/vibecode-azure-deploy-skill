@@ -120,7 +120,12 @@ def az_json(args: list[str]) -> Any:
 
 
 def az_rest(method: str, url: str, body: Optional[dict] = None) -> Any:
-    """Invoke an ARM REST call via `az rest` and return parsed JSON."""
+    """Invoke an ARM REST call via `az rest` and return parsed JSON.
+
+    Returns None for HTTP 404 on GETs (treats "does not exist yet" as a
+    non-error so callers can do GET-then-PUT idempotency). Any other
+    non-zero exit is fatal.
+    """
     args = ["az", "rest", "--method", method, "--url", url]
     tmp = None
     if body is not None:
@@ -140,6 +145,16 @@ def az_rest(method: str, url: str, body: Optional[dict] = None) -> Any:
             except OSError:
                 pass
     if cp.returncode != 0:
+        # GET on a not-yet-created resource: az rest writes the ARM
+        # ResourceNotFound envelope to stderr and exits non-zero. Treat
+        # that as "resource doesn't exist" so GET-then-PUT works.
+        combined = (cp.stderr or "") + (cp.stdout or "")
+        if method.upper() == "GET" and (
+            "ResourceNotFound" in combined
+            or '"code":"NotFound"' in combined
+            or "(404)" in combined
+        ):
+            return None
         err(f"ARM REST {method} {url} failed:\n{cp.stderr or cp.stdout}")
         sys.exit(1)
     if not cp.stdout.strip():
