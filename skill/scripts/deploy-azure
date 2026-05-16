@@ -683,9 +683,16 @@ def _flex_deploy(cfg: Config, env_name: str, app: str, image: str, port: int,
                              "value": cfg.db["connection_string"]})
         env_vars.append({"name": "DATABASE_URL",
                          "secretRef": "database-url"})
+    # User-defined env vars from azure.toml [backend.env]. These are plain
+    # (non-secret) values — strings get passed through. For secrets, use
+    # `deploy-azure secret set` (coming soon) or rely on Managed Identity.
+    user_env = (cfg.backend or {}).get("env") or {}
+    for k, v in user_env.items():
+        env_vars.append({"name": str(k), "value": str(v)})
     secrets_list.append({"name": "registry-password", "value": reg_pw})
 
     acr_server = image.split("/")[0]
+    use_mi = bool((cfg.backend or {}).get("identity", False))
     app_body = {
         "location": cfg.region,
         "properties": {
@@ -718,6 +725,8 @@ def _flex_deploy(cfg: Config, env_name: str, app: str, image: str, port: int,
             },
         },
     }
+    if use_mi:
+        app_body["identity"] = {"type": "SystemAssigned"}
     info(f"Deploying Flex container app {app} (~30s)…")
     az_rest("PUT", app_url, app_body)
     final = _poll_provisioning(app_url, f"container app {app}", timeout_s=180)
@@ -776,11 +785,25 @@ def _express_deploy(cfg: "Config", env_name: str, app: str, image: str,
     if min_replicas > max_replicas:
         min_replicas = max_replicas
 
+    # Express enforces strict CPU:memory pairs: memory_gi must equal cpu*2.
+    # Auto-snap if the user's azure.toml has Flex-style defaults (0.5cpu/2Gi).
+    expected_mem = f"{cpu * 2:g}Gi"
+    if memory != expected_mem:
+        warn(f"Express requires memory = cpu*2 Gi; snapping "
+             f"memory {memory} → {expected_mem} for cpu={cpu}.")
+        memory = expected_mem
+
     secrets_args: list[str] = []
     env_args: list[str] = []
+    env_kvs: list[str] = []
     if cfg.db and cfg.db.get("connection_string"):
         secrets_args = ["--secrets", f"database-url={cfg.db['connection_string']}"]
-        env_args = ["--env-vars", "DATABASE_URL=secretref:database-url"]
+        env_kvs.append("DATABASE_URL=secretref:database-url")
+    user_env = (cfg.backend or {}).get("env") or {}
+    for k, v in user_env.items():
+        env_kvs.append(f"{k}={v}")
+    if env_kvs:
+        env_args = ["--env-vars"] + env_kvs
 
     existing = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app])
     if not existing:
@@ -806,12 +829,17 @@ def _express_deploy(cfg: "Config", env_name: str, app: str, image: str,
         update_cmd = ["az", "containerapp", "update",
                       "-g", cfg.rg, "-n", app, "--image", image]
         if env_args:
-            update_cmd += env_args
+            update_cmd += ["--set-env-vars"] + env_kvs
         run(update_cmd, capture=True)
         if secrets_args:
             run(["az", "containerapp", "secret", "set",
                  "-g", cfg.rg, "-n", app] + secrets_args, capture=True)
     ok(f"Container App {app} ready (Express).")
+
+    if (cfg.backend or {}).get("identity", False):
+        info("Ensuring system-assigned managed identity on container app…")
+        run(["az", "containerapp", "identity", "assign",
+             "-g", cfg.rg, "-n", app, "--system-assigned"], capture=True)
 
     fqdn = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app,
                     "--query", "properties.configuration.ingress.fqdn"])
@@ -834,9 +862,15 @@ def _consumption_deploy(cfg: Config, env_name: str, app: str, image: str,
 
     secrets_args: list[str] = []
     env_args: list[str] = []
+    env_kvs: list[str] = []
     if cfg.db and cfg.db.get("connection_string"):
         secrets_args = ["--secrets", f"database-url={cfg.db['connection_string']}"]
-        env_args = ["--env-vars", "DATABASE_URL=secretref:database-url"]
+        env_kvs.append("DATABASE_URL=secretref:database-url")
+    user_env = (cfg.backend or {}).get("env") or {}
+    for k, v in user_env.items():
+        env_kvs.append(f"{k}={v}")
+    if env_kvs:
+        env_args = ["--env-vars"] + env_kvs
 
     existing = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app])
     if not existing:
@@ -867,6 +901,11 @@ def _consumption_deploy(cfg: Config, env_name: str, app: str, image: str,
             run(["az", "containerapp", "secret", "set",
                  "-g", cfg.rg, "-n", app] + secrets_args, capture=True)
     ok(f"Container App {app} ready.")
+
+    if (cfg.backend or {}).get("identity", False):
+        info("Ensuring system-assigned managed identity on container app…")
+        run(["az", "containerapp", "identity", "assign",
+             "-g", cfg.rg, "-n", app, "--system-assigned"], capture=True)
 
     fqdn = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app,
                     "--query", "properties.configuration.ingress.fqdn"])

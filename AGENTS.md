@@ -59,6 +59,18 @@ A `--json` flag is available on `up`, `status`, and `doctor` for machine-readabl
 
 The script is also safe to interrupt with SIGINT mid-step. The next `up` resumes from the first incomplete resource.
 
+## Configuration extras
+
+`azure.toml` supports two backend extras agents care about:
+
+- `[backend.env]` table — non-secret env vars injected into the container app on every `up`. Example:
+  ```toml
+  [backend.env]
+  AOAI_ENDPOINT = "https://your-foundry.openai.azure.com"
+  AOAI_DEPLOYMENT = "gpt-4o-mini"
+  ```
+- `[backend] identity = true` — provisions a system-assigned managed identity on the container app and preserves it across redeploys. Use this for keyless AAD auth to Azure OpenAI, Storage, Key Vault, etc. After the first `up`, grant the identity its roles once (e.g. `az role assignment create --assignee-object-id $(az containerapp show -g RG -n APP --query identity.principalId -o tsv) --role "Cognitive Services User" --scope $AOAI_SCOPE`). The identity object id is stable across redeploys.
+
 ## Recovery without the user
 
 When you get a non-zero exit, do this **before** asking the user anything:
