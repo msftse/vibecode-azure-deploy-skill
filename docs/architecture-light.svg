@@ -1,394 +1,177 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 920" font-family="'Segoe UI', 'Segoe UI Variable', system-ui, sans-serif">
-  <!-- ============================================================ -->
-  <!-- Azure-style reference architecture                           -->
-  <!-- Left-to-right: Author -> CLI -> Subscription -> End user     -->
-  <!-- ============================================================ -->
-
-  <defs>
-    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#E5E9F0" stroke-width="0.5"/>
-    </pattern>
-
-    <linearGradient id="azBlue" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#50E6FF"/>
-      <stop offset="55%" stop-color="#0078D4"/>
-      <stop offset="100%" stop-color="#004E8C"/>
-    </linearGradient>
-    <linearGradient id="azCyan" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#9CECFB"/>
-      <stop offset="100%" stop-color="#0078D4"/>
-    </linearGradient>
-    <linearGradient id="azTeal" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7FE3D0"/>
-      <stop offset="100%" stop-color="#00A4A4"/>
-    </linearGradient>
-    <linearGradient id="azPg" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#7BB3E5"/>
-      <stop offset="100%" stop-color="#336791"/>
-    </linearGradient>
-    <linearGradient id="azIndigo" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#8C8DFF"/>
-      <stop offset="100%" stop-color="#4B53BC"/>
-    </linearGradient>
-
-    <filter id="cardShadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0B2545" flood-opacity="0.10"/>
-    </filter>
-
-    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#0078D4"/>
-    </marker>
-    <marker id="arrowTeal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#00A4A4"/>
-    </marker>
-    <marker id="arrowSlate" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#605E5C"/>
-    </marker>
-    <marker id="arrowOrange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
-      <path d="M0,0 L10,5 L0,10 z" fill="#D83B01"/>
-    </marker>
-  </defs>
-
-  <rect width="1600" height="920" fill="#FAFBFC"/>
-  <rect width="1600" height="920" fill="url(#grid)"/>
-
-  <!-- ============== Title bar ============== -->
-  <g transform="translate(48, 30)">
-    <g transform="translate(0, 0)">
-      <rect x="0"  y="0"  width="14" height="14" fill="#F25022"/>
-      <rect x="16" y="0"  width="14" height="14" fill="#7FBA00"/>
-      <rect x="0"  y="16" width="14" height="14" fill="#00A4EF"/>
-      <rect x="16" y="16" width="14" height="14" fill="#FFB900"/>
-    </g>
-    <text x="44" y="14" font-size="13" font-weight="600" fill="#605E5C" letter-spacing="0.6">MICROSOFT AZURE</text>
-    <text x="44" y="32" font-size="11" fill="#8A8886">Reference architecture · Container Apps Express (Public Preview, May 2026)</text>
-    <text x="1504" y="14" font-size="11" fill="#8A8886" text-anchor="end">vibecode-azure-deploy v0.1</text>
-    <text x="1504" y="32" font-size="11" fill="#8A8886" text-anchor="end">github.com/msftse/vibecode-azure-deploy-skill</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1680 1020" width="1680" height="1020">
+<defs>
+  <marker id="m-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0078D4"/></marker>
+  <marker id="m-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#00A4A4"/></marker>
+  <marker id="m-orange" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#D83B01"/></marker>
+  <marker id="m-grey" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8B8680"/></marker>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0a0e1a"/><stop offset="1" stop-color="#0c1424"/>
+  </linearGradient>
+</defs>
+<rect width="1680" height="1020" fill="url(#bg)"/>
+<g>
+  <g transform="translate(40,34)">
+    <rect width="14" height="14" fill="#f25022"/><rect x="16" width="14" height="14" fill="#7fba00"/>
+    <rect y="16" width="14" height="14" fill="#00a4ef"/><rect x="16" y="16" width="14" height="14" fill="#ffb900"/>
   </g>
-
-  <text x="48" y="98" font-size="26" font-weight="600" fill="#323130">From <tspan fill="#0078D4">azure.toml</tspan> to a public URL in 90 seconds</text>
-  <text x="48" y="120" font-size="13" fill="#605E5C">Static Web Apps · Container Apps Express (Flex fallback) · Container Registry · Postgres Flexible Server · provisioned via Azure CLI and ARM REST</text>
-
-  <line x1="48" y1="138" x2="1552" y2="138" stroke="#E5E9F0"/>
-
-  <!-- ============== Column headers ============== -->
-  <g font-size="10" font-weight="600" fill="#8A8886" letter-spacing="0.8">
-    <text x="148"  y="172" text-anchor="middle">AUTHOR</text>
-    <text x="370"  y="172" text-anchor="middle">DEPLOYMENT CLI</text>
-    <text x="900"  y="172" text-anchor="middle">AZURE SUBSCRIPTION</text>
-    <text x="1460" y="172" text-anchor="middle">END USER</text>
+  <text x="84" y="48" font-family="Segoe UI,Inter,sans-serif" font-size="16" font-weight="600" fill="#e5e7eb">Microsoft Azure</text>
+  <text x="84" y="66" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">Reference architecture · vibecode-azure-deploy-skill</text>
+  <text x="1640" y="48" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">Container Apps Express · ARM 2025-10-02-preview</text>
+  <text x="1640" y="66" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">One-command full-stack deploy</text>
+</g>
+<text x="170" y="190" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#94a3b8">AUTHOR</text>
+<g>
+  <rect x="40" y="210" width="260" height="180" rx="8" fill="#111827" stroke="#1f2937"/>
+  <rect x="40" y="210" width="260" height="24" rx="8" fill="#1e293b"/>
+  <circle cx="54" cy="222" r="3" fill="#ef4444"/>
+  <circle cx="66" cy="222" r="3" fill="#f59e0b"/>
+  <circle cx="78" cy="222" r="3" fill="#10b981"/>
+  <text x="170.0" y="226" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#94a3b8">azure.toml</text>
+  <g font-family="ui-monospace,SF Mono,monospace" font-size="11">
+    <text x="56" y="260" fill="#93c5fd">[app]</text>
+    <text x="56" y="278" fill="#e5e7eb">name = <tspan fill="#a5f3fc">"myapp"</tspan></text>
+    <text x="56" y="296" fill="#e5e7eb">profile = <tspan fill="#a5f3fc">"express"</tspan></text>
+    <text x="56" y="322" fill="#93c5fd">[backend]</text>
+    <text x="56" y="340" fill="#e5e7eb">dockerfile = <tspan fill="#a5f3fc">"./api"</tspan></text>
+    <text x="56" y="366" fill="#93c5fd">[frontend]</text>
+    <text x="56" y="384" fill="#e5e7eb">dist = <tspan fill="#a5f3fc">"./web/dist"</tspan></text>
   </g>
-  <g stroke="#E5E9F0">
-    <line x1="48"   y1="184" x2="248"  y2="184"/>
-    <line x1="270"  y1="184" x2="490"  y2="184"/>
-    <line x1="510"  y1="184" x2="1310" y2="184"/>
-    <line x1="1372" y1="184" x2="1552" y2="184"/>
+</g>
+<g>
+  <rect x="40" y="420" width="260" height="180" rx="8" fill="#000814" stroke="#1f2937"/>
+  <rect x="40" y="420" width="260" height="24" rx="8" fill="#0b1426"/>
+  <text x="170.0" y="436" text-anchor="middle" font-family="ui-monospace,monospace" font-size="10" fill="#94a3b8">Terminal</text>
+  <g font-family="ui-monospace,SF Mono,monospace" font-size="11">
+    <text x="56" y="470" fill="#10b981">$ </text><text x="68" y="470" fill="#e5e7eb">deploy-azure up</text>
+    <text x="56" y="494" fill="#94a3b8">▸ build image (ACR)   45s</text>
+    <text x="56" y="512" fill="#94a3b8">▸ create env          20s</text>
+    <text x="56" y="530" fill="#94a3b8">▸ create container app 15s</text>
+    <text x="56" y="552" fill="#10b981">✓ live in 80s</text>
+    <text x="56" y="576" fill="#60a5fa" font-size="10">https://myapp.…azurecontainerapps.io</text>
   </g>
-
-  <!-- ============== Author column ============== -->
-  <g transform="translate(48, 210)" filter="url(#cardShadow)">
-    <rect width="200" height="130" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 22)">
-      <circle cx="22" cy="18" r="11" fill="#605E5C"/>
-      <path d="M 4 56 Q 4 36 22 36 Q 40 36 40 56 Z" fill="#605E5C"/>
-    </g>
-    <text x="86" y="36" font-size="14" font-weight="600" fill="#323130">Developer</text>
-    <text x="86" y="54" font-size="11" fill="#605E5C">Writes app code +</text>
-    <text x="86" y="68" font-size="11" fill="#605E5C">one azure.toml file</text>
-    <line x1="20" y1="92" x2="180" y2="92" stroke="#E5E9F0"/>
-    <text x="20" y="112" font-size="11" fill="#605E5C" font-family="'Cascadia Code','Consolas',monospace">$ deploy-azure init</text>
+</g>
+<text x="170" y="630" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">Developer · single command</text>
+<g>
+  <rect x="360" y="200" width="940" height="660" rx="14" fill="none" stroke="#0078D4" stroke-width="1.3" stroke-dasharray="6,4" opacity="0.7"/>
+  <g transform="translate(376,214)">
+    <image href="data:image/svg+xml;base64,PHN2ZyBpZD0iYTY4NWNjOGMtMzJiYS00ZDU0LTkxZGEtM2ExMjVjYjU4ZGVkIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48dGl0bGU+SWNvbi1nZW5lcmFsLTc8L3RpdGxlPjxnPjxnPjxwYXRoIGQ9Ik0uNSwxNS4wOGEuMTYuMTYsMCwwLDAsLjA4LjE0bDEuMTYuNjVMMy43LDE3YS4xNy4xNywwLDAsMCwuMjMtLjA2bC42Ni0xLjEyYS4xNi4xNiwwLDAsMC0uMDYtLjIxbC0yLjMtMS4zYS4xNy4xNywwLDAsMS0uMDgtLjE0VjMuODVhLjE2LjE2LDAsMCwxLC4wOC0uMTRsMi4zLTEuM2EuMTYuMTYsMCwwLDAsLjA2LS4yMUwzLjkzLDEuMDhBLjE3LjE3LDAsMCwwLDMuNywxTDEuNzgsMi4xMWwtMS4yLjY3YS4xNi4xNiwwLDAsMC0uMDguMTRWMTUuMDhaIiBmaWxsPSIjOTQ5NDk0IiAvPjxwYXRoIGQ9Ik0yLjE0LDMuNzdsLjA2LS4wNiwyLjMtMS4zYS4xNC4xNCwwLDAsMCwuMDYtLjIxTDMuOSwxLjA4QS4xNS4xNSwwLDAsMCwzLjY4LDFMMS43NSwyLjExLjU2LDIuNzhzLS4wNSwwLS4wNi4wNmwuOS41MVoiIGZpbGw9IiNhM2EzYTMiIC8+PHBhdGggZD0iTTQuNSwxNS41OWwtMi4zLTEuM2EuMjIuMjIsMCwwLDEtLjA3LS4wOWwtMS42MiwxLC4wNSwwLDEuMTUuNjUsMiwxLjExYS4xNS4xNSwwLDAsMCwuMjItLjA2bC42Ni0xLjEyQS4xNC4xNCwwLDAsMCw0LjUsMTUuNTlaIiBmaWxsPSIjYTNhM2EzIiAvPjwvZz48cGF0aCBkPSJNMTcuNSwxNS4wOGEuMTYuMTYsMCwwLDEtLjA4LjE0bC0xLjE2LjY1TDE0LjMsMTdhLjE3LjE3LDAsMCwxLS4yMy0uMDZsLS42Ni0xLjEyYS4xNi4xNiwwLDAsMSwuMDYtLjIxbDIuMy0xLjNhLjE3LjE3LDAsMCwwLC4wOC0uMTRWMy44NWEuMTYuMTYsMCwwLDAtLjA4LS4xNGwtMi4zLTEuM2EuMTYuMTYsMCwwLDEtLjA2LS4yMWwuNjYtMS4xMkEuMTcuMTcsMCwwLDEsMTQuMywxbDEuOTIsMS4wOSwxLjIuNjdhLjE2LjE2LDAsMCwxLC4wOC4xNFYxNS4wOFoiIGZpbGw9IiM5NDk0OTQiIC8+PHBhdGggZD0iTTE1Ljg2LDMuNzdsLS4wNi0uMDYtMi4zLTEuM2EuMTQuMTQsMCwwLDEtLjA2LS4yMWwuNjYtMS4xMkEuMTUuMTUsMCwwLDEsMTQuMzIsMWwxLjkzLDEuMDksMS4xOS42N3MwLDAsLjA2LjA2bC0uOS41MVoiIGZpbGw9IiNhM2EzYTMiIC8+PHBhdGggZD0iTTEzLjUsMTUuNTlsMi4zLTEuM2EuMjIuMjIsMCwwLDAsLjA3LS4wOWwxLjYyLDEsMCwwLTEuMTUuNjUtMiwxLjExYS4xNS4xNSwwLDAsMS0uMjItLjA2bC0uNjYtMS4xMkEuMTQuMTQsMCwwLDEsMTMuNSwxNS41OVoiIGZpbGw9IiNhM2EzYTMiIC8+PHBvbHlnb24gcG9pbnRzPSIxNC4zMSA1LjkzIDE0LjMxIDEyLjA3IDguOTkgMTUuMTYgOC45OSA5LjAxIDE0LjMxIDUuOTMiIGZpbGw9IiMzMmJlZGQiIC8+PHBvbHlnb24gcG9pbnRzPSIxNC4zMSA1LjkzIDkgOS4wMiAzLjY4IDUuOTMgOSAyLjg0IDE0LjMxIDUuOTMiIGZpbGw9IiM5Y2ViZmYiIC8+PHBvbHlnb24gcG9pbnRzPSI4Ljk5IDkuMDIgOC45OSAxNS4xNiAzLjY4IDEyLjA3IDMuNjggNS45MyA4Ljk5IDkuMDIiIGZpbGw9IiM1MGU2ZmYiIC8+PHBvbHlnb24gcG9pbnRzPSIzLjY4IDEyLjA3IDguOTkgOS4wMSA4Ljk5IDE1LjE2IDMuNjggMTIuMDciIGZpbGw9IiM5Y2ViZmYiIC8+PHBvbHlnb24gcG9pbnRzPSIxNC4zMSAxMi4wNyA4Ljk5IDkuMDEgOC45OSAxNS4xNiAxNC4zMSAxMi4wNyIgZmlsbD0iIzUwZTZmZiIgLz48L2c+PC9zdmc+" width="22" height="22"/>
+    <text x="30" y="11" font-family="Segoe UI,Inter,sans-serif" font-size="12" font-weight="600" fill="#e5e7eb">Resource Group</text>
+    <text x="30" y="26" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#94a3b8">rg-myapp · westcentralus / eastasia (Express preview)</text>
   </g>
-
-  <!-- azure.toml file card -->
-  <g transform="translate(48, 360)" filter="url(#cardShadow)">
-    <rect width="200" height="180" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <rect width="200" height="30" rx="8" fill="#F3F2F1"/>
-    <rect y="18" width="200" height="12" fill="#F3F2F1"/>
-    <text x="100" y="20" font-size="11" font-weight="600" fill="#323130" text-anchor="middle">azure.toml</text>
-    <g font-size="10" font-family="'Cascadia Code','Consolas',monospace">
-      <text x="14" y="50" fill="#A19F9D">[project]</text>
-      <text x="14" y="65" fill="#323130">name = <tspan fill="#A31515">"myapp"</tspan></text>
-      <text x="14" y="80" fill="#323130">region = <tspan fill="#A31515">"eastasia"</tspan></text>
-      <text x="14" y="100" fill="#A19F9D">[backend]</text>
-      <text x="14" y="115" fill="#323130">profile = <tspan fill="#A31515">"express"</tspan></text>
-      <text x="14" y="130" fill="#323130">port = <tspan fill="#098658">8000</tspan></text>
-      <text x="14" y="150" fill="#A19F9D">[frontend]</text>
-      <text x="14" y="165" fill="#323130">type = <tspan fill="#A31515">"swa"</tspan></text>
-    </g>
+  <g transform="translate(1284,214)">
+    <image href="data:image/svg+xml;base64,PHN2ZyBpZD0iYmMxOGJhZGUtNTQ4MS00NDdlLWE5NTktNjU5ZDcyMzQ2NDc0IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImE0NDVjNzE3LTlkNzUtNDRjNy1iYTZiLTBkOGYyMzgzZTU2MCIgY3g9Ii0zNi42MyIgY3k9IjE3LjEyIiByPSIxMS4xOCIgZ3JhZGllbnRUcmFuc2Zvcm09InRyYW5zbGF0ZSg0MS44OCAtNy40KSBzY2FsZSgwLjk0IDAuOTQpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwLjI3IiBzdG9wLWNvbG9yPSIjZmZkNzBmIiAvPjxzdG9wIG9mZnNldD0iMC40OSIgc3RvcC1jb2xvcj0iI2ZmY2IxMiIgLz48c3RvcCBvZmZzZXQ9IjAuODgiIHN0b3AtY29sb3I9IiNmZWFjMTkiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmVhMTFiIiAvPjwvcmFkaWFsR3JhZGllbnQ+PC9kZWZzPjx0aXRsZT5JY29uLWdlbmVyYWwtMjwvdGl0bGU+PHBhdGggaWQ9ImUzZDFlNThjLWY3OGUtNGZiNS05ODU3LTBjOTMzMWRhOTk3OSIgZD0iTTEzLjU2LDcuMTlhMi4wNywyLjA3LDAsMCwwLDAtMi45M2gwTDEwLC42OWEyLjA2LDIuMDYsMCwwLDAtMi45MiwwaDBMMy41Miw0LjI2YTIuMDksMi4wOSwwLDAsMCwwLDIuOTNsMywzYS42MS42MSwwLDAsMSwuMTcuNDF2NS41MmEuNy43LDAsMCwwLC4yLjVsMS4zNSwxLjM1YS40NS40NSwwLDAsMCwuNjYsMGwxLjMxLTEuMzFoMGwuNzctLjc3YS4yNi4yNiwwLDAsMCwwLS4zOGwtLjU1LS41NmEuMjkuMjksMCwwLDEsMC0uNDJsLjU1LS41NmEuMjYuMjYsMCwwLDAsMC0uMzhMMTAuNCwxM2EuMjguMjgsMCwwLDEsMC0uNDFMMTEsMTJhLjI2LjI2LDAsMCwwLDAtLjM4bC0uNzctLjc4di0uMjhabS01LTUuNjRBMS4xOCwxLjE4LDAsMSwxLDcuMzcsMi43MywxLjE3LDEuMTcsMCwwLDEsOC41NCwxLjU1WiIgZmlsbD0idXJsKCNhNDQ1YzcxNy05ZDc1LTQ0YzctYmE2Yi0wZDhmMjM4M2U1NjApIiAvPjxwYXRoIGlkPSJhMjFhOGY3YS02MWNjLTQwMzUtODQ0OS1lNWM4ZmU0ZDRkNWUiIGQ9Ik03LjYyLDE2LjIxaDBBLjI1LjI1LDAsMCwwLDgsMTZWMTEuNTVhLjI3LjI3LDAsMCwwLS4xMS0uMjJoMGEuMjUuMjUsMCwwLDAtLjM5LjIyVjE2QS4yNy4yNywwLDAsMCw3LjYyLDE2LjIxWiIgZmlsbD0iI2ZmOTMwMCIgb3BhY2l0eT0iMC43NSIgLz48cmVjdCBpZD0iZWNkMzE4OWMtZmIxZS00YTBlLWEyYjYtYmEyZjExZGRhNDg0IiB4PSI1LjY5IiB5PSI1LjQ1IiB3aWR0aD0iNS44NiIgaGVpZ2h0PSIwLjY5IiByeD0iMC4zMiIgZmlsbD0iI2ZmOTMwMCIgb3BhY2l0eT0iMC43NSIgLz48cmVjdCBpZD0iYTE5NDlhM2MtNDgxOC00YmQxLWIyMzYtMGQ5NzBiOTJmYzYyIiB4PSI1LjY5IiB5PSI2LjU3IiB3aWR0aD0iNS44NiIgaGVpZ2h0PSIwLjY5IiByeD0iMC4zMiIgZmlsbD0iI2ZmOTMwMCIgb3BhY2l0eT0iMC43NSIgLz48L3N2Zz4=" x="-200" width="18" height="18"/>
+    <text x="-176" y="13" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#94a3b8">Subscription · fa97de70-…</text>
   </g>
-
-  <!-- ============== CLI column ============== -->
-  <g transform="translate(270, 210)" filter="url(#cardShadow)">
-    <rect width="220" height="330" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <rect width="220" height="32" rx="8" fill="#323130"/>
-    <rect y="22" width="220" height="10" fill="#323130"/>
-    <circle cx="14" cy="16" r="4" fill="#FF5F57"/>
-    <circle cx="28" cy="16" r="4" fill="#FEBC2E"/>
-    <circle cx="42" cy="16" r="4" fill="#28C840"/>
-    <text x="110" y="20" font-size="11" font-weight="600" fill="#FFFFFF" text-anchor="middle" font-family="'Cascadia Code','Consolas',monospace">deploy-azure</text>
-
-    <g font-size="11" font-family="'Cascadia Code','Consolas',monospace">
-      <text x="14" y="58" fill="#0078D4">$ deploy-azure up</text>
-      <text x="14" y="78" fill="#605E5C">→ az acr build  · 45 s</text>
-      <text x="14" y="96" fill="#605E5C">→ env create    · 20 s</text>
-      <text x="14" y="114" fill="#605E5C">→ app create    · 15 s</text>
-      <text x="14" y="132" fill="#107C10">✓ live in 90 s</text>
-    </g>
-
-    <line x1="14" y1="152" x2="206" y2="152" stroke="#E5E9F0"/>
-    <text x="14" y="172" font-size="10" font-weight="600" fill="#8A8886" letter-spacing="0.5">CONTROL PLANE</text>
-    <g font-size="11">
-      <text x="14" y="194" font-weight="600" fill="#0078D4">az CLI ≥ 2.85</text>
-      <text x="14" y="210" fill="#605E5C">containerapp ext 1.3.0b4</text>
-      <text x="14" y="234" font-weight="600" fill="#0078D4">ARM REST</text>
-      <text x="14" y="250" fill="#605E5C">Microsoft.App provider</text>
-      <text x="14" y="264" fill="#605E5C">api 2025-10-02-preview</text>
-    </g>
-    <line x1="14" y1="282" x2="206" y2="282" stroke="#E5E9F0"/>
-    <text x="14" y="302" font-size="10" fill="#605E5C">Single Python script,</text>
-    <text x="14" y="316" font-size="10" fill="#605E5C">stdlib only · idempotent</text>
+</g>
+<g>
+<rect x="400" y="270" width="220" height="110" rx="10" fill="#111827" stroke="#1f2937"/>
+<rect x="400" y="270" width="220" height="3" rx="2" fill="#0078D4"/>
+<image href="data:image/svg+xml;base64,PHN2ZyBpZD0iZTlmN2JhNzMtNTZiOC00ODY0LTk2ZmYtZGNlODBiZWY3MjlhIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImJkZjI3ZGM2LTAyNWMtNDgwNS04YmZkLTNhMDVkZWZkM2ZiZCIgeDE9IjguNjM3IiB5MT0iLTEuOTkxIiB4Mj0iOC42MzciIHkyPSIxNi43MzkiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1ZWEwZWYiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA3OGQ0IiAvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJmY2Q2YzZjNy1lMmViLTRhMzItYjkxNC0zYTg0ODU1ODVhMWIiIHgxPSIxMi45NiIgeTE9IjguNTYxIiB4Mj0iMTIuOTYiIHkyPSI2LjE0MSIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgxLCAwLCAwLCAtMSwgMCwgMjApIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMzMzMTMyIiAvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzViNWE1YyIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48cGF0aCBkPSJNNy40Myw4LjE3OGwyLjU4OS0xLjU3Myw3LjI1NSwyLjczMUEzLjY2NCwzLjY2NCwwLDAsMCwxNi4yMyw3LjQ5bC0uMDEtLjA1QTQuMTk0LDQuMTk0LDAsMCwwLDE0LDYuMzJhNC45MSw0LjkxLDAsMCwwLTUuMS00LjdBNS4wNzEsNS4wNzEsMCwwLDAsNC4wNiw0LjkxLDQuNjIxLDQuNjIxLDAsMCwwLDAsOS4zOWE0LjczLDQuNzMsMCwwLDAsNC44OSw0LjU0SDcuNDNaIiBmaWxsPSJ1cmwoI2JkZjI3ZGM2LTAyNWMtNDgwNS04YmZkLTNhMDVkZWZkM2ZiZCkiIC8+PHBvbHlnb24gcG9pbnRzPSIxMC4wNyA3LjE1OSAxMC4wOCAxMS40MzkgMTcuOTkgMTMuMTE5IDE3Ljk5IDEwLjEzOSAxMC4wNyA3LjE1OSIgZmlsbD0iIzc2NzY3NiIgLz48cG9seWxpbmUgcG9pbnRzPSIxMC4wNyA3LjE1OSA3LjkzIDguNDU5IDcuOTMgMTIuNDM5IDEwLjA4IDExLjQzOSIgZmlsbD0iIzk5OSIgLz48cG9seWdvbiBwb2ludHM9IjEzLjY4IDExLjQ5OSAxNC40IDExLjY5OSAxNC40IDkuMzY5IDEzLjY4IDkuMTE5IDEzLjY4IDExLjQ5OSIgZmlsbD0iI2EzYTNhMyIgLz48cG9seWdvbiBwb2ludHM9IjEyLjk2IDguODg5IDEyLjI0IDguNjI5IDEyLjI0IDExLjExOSAxMi45NiAxMS4zMTkgMTIuOTYgOC44ODkiIGZpbGw9IiNhM2EzYTMiIC8+PHBvbHlnb24gcG9pbnRzPSIxNS4xMiAxMS44ODkgMTUuODIgMTIuMDc5IDE1Ljg0IDkuODU5IDE1LjEyIDkuNjE5IDE1LjEyIDExLjg4OSIgZmlsbD0iI2EzYTNhMyIgLz48cG9seWdvbiBwb2ludHM9IjEwLjgxIDEwLjc0OSAxMS41MyAxMC45MjkgMTEuNTMgOC4zOTkgMTAuODEgOC4xNTkgMTAuODEgMTAuNzQ5IiBmaWxsPSIjYTNhM2EzIiAvPjxwb2x5Z29uIHBvaW50cz0iMTcuMjcgMTAuMzQ5IDE2LjU1IDEwLjA5OSAxNi41NSAxMi4yNjkgMTcuMjcgMTIuNDY5IDE3LjI3IDEwLjM0OSIgZmlsbD0iI2EzYTNhMyIgLz48cGF0aCBpZD0iZWYwZDFiNTQtYTFlNy00Y2I5LWE0ZTUtOGE4NTE4ZTdjMTI3IiBkPSJNOC42NiwxMS4zNjlsLS4zNi4yMVY4Ljc0OWwuMzYtLjE5Wm0uNzEtMy4yMkw5LDguMzg5djIuNzVsLjM3LS4yWiIgZmlsbD0iI2IzYjNiMyIgLz48cG9seWdvbiBwb2ludHM9IjE3Ljk5IDEzLjExOSAxNS44MyAxMy44NTkgNy45MyAxMi40MzkgMTAuMDggMTEuNDM5IDE3Ljk5IDEzLjExOSIgZmlsbD0idXJsKCNmY2Q2YzZjNy1lMmViLTRhMzItYjkxNC0zYTg0ODU1ODVhMWIpIiAvPjxwb2x5Z29uIHBvaW50cz0iMTcuOTkgMTYuMTY5IDEwLjA0IDE3LjY3OSAxMC4wOCAxMi4wODkgMTcuOTkgMTMuNTU5IDE3Ljk5IDE2LjE2OSIgZmlsbD0iIzc2NzY3NiIgLz48cG9seWdvbiBwb2ludHM9IjEwLjgxIDE2Ljc1OSAxMC44MSAxMy4yMDkgMTEuNTMgMTMuMjk5IDExLjUzIDE2LjYzOSAxMC44MSAxNi43NTkiIGZpbGw9IiNhM2EzYTMiIC8+PHBvbHlnb24gcG9pbnRzPSIxMi45NiAxNi4zOTkgMTIuMjQgMTYuNTI5IDEyLjI0IDEzLjM4OSAxMi45NiAxMy40OTkgMTIuOTYgMTYuMzk5IDEyLjk2IDE2LjM5OSIgZmlsbD0iI2EzYTNhMyIgLz48cG9seWdvbiBwb2ludHM9IjEzLjY4IDE2LjI4OSAxMy42OCAxMy41NjkgMTQuNCAxMy42NTkgMTQuNCAxNi4xNTkgMTMuNjggMTYuMjg5IiBmaWxsPSIjYTNhM2EzIiAvPjxwb2x5Z29uIHBvaW50cz0iMTUuODMgMTUuOTA5IDE1LjEyIDE2LjAzOSAxNS4xMiAxMy43NDkgMTUuODMgMTMuODU5IDE1LjgzIDE1LjkwOSIgZmlsbD0iI2EzYTNhMyIgLz48cG9seWdvbiBwb2ludHM9IjE3LjI5IDE1LjY3OSAxNi41NSAxNS44MDkgMTYuNTUgMTMuOTI5IDE3LjI0IDE0LjAxOSAxNy4yOSAxNS42NzkiIGZpbGw9IiNhM2EzYTMiIC8+PHBhdGggaWQ9ImI5ZjI1ZWI0LTRjODgtNDVjMi1iYzRkLWY5OTI3NTdkN2UwZSIgZD0iTTcuOTMsMTYuNHYtMy4yNmwyLjE2LTF2NS42WiIgZmlsbD0iIzk5OSIgLz48cGF0aCBpZD0iZWI5MjAwYTctNDY5My00NDI3LWJkYWUtYjMzY2U5MGZmN2YyIiBkPSJNOC42MSwxNi4zODlsLS4zMi0uMTZ2LTIuNzZsLjMyLS4xNVptLjc3LTMuNDUtLjM4LjE5djMuNDhsLjM3LjE5di0zLjg2WiIgZmlsbD0iI2IzYjNiMyIgLz48L3N2Zz4=" x="414" y="284" width="36" height="36"/>
+<text x="606" y="294" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" fill="#94a3b8" letter-spacing="1.4">CONTAINERS</text>
+<text x="414" y="350" font-family="Segoe UI,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e7eb">Container Registry</text>
+<text x="414" y="368" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">vibecodedemoacr.azurecr.io</text>
+</g>
+<g>
+  <rect x="680" y="270" width="580" height="280" rx="12" fill="#0f1729" stroke="#004E8C" stroke-width="1.3" stroke-dasharray="4,3"/>
+  <g transform="translate(694,284)">
+    <image href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEzYTQ0MDkzLWIxNTctNDI2ZS1hOGZlLWNlYzlmOWMyMzk3OCIgeDE9IjExLjcyOSIgeTE9IjQuODgiIHgyPSIxMS43MjkiIHkyPSIxMy4wOTkiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBvZmZzZXQ9IjAuMDAxIiBzdG9wLWNvbG9yPSIjNzczYWRjIiAvPjxzdG9wIG9mZnNldD0iMC41MjgiIHN0b3AtY29sb3I9IiM2NjM1YmIiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTUyZjk5IiAvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJhZDgzODg1OS0wM2Y0LTQ3MmYtODFiYy1lYmM5MjFkNzEzMzUiIHgxPSI2LjM1IiB5MT0iMTMuOTE0IiB4Mj0iNi4zNSIgeTI9IjQuMTk4IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwLjAwMSIgc3RvcC1jb2xvcj0iIzc3M2FkYyIgLz48c3RvcCBvZmZzZXQ9IjAuMzA3IiBzdG9wLWNvbG9yPSIjNzkzZGRkIiAvPjxzdG9wIG9mZnNldD0iMC41MzIiIHN0b3AtY29sb3I9IiM4MDQ2ZTEiIC8+PHN0b3Agb2Zmc2V0PSIwLjczMSIgc3RvcC1jb2xvcj0iIzhjNTZlNyIgLz48c3RvcCBvZmZzZXQ9IjAuOTE1IiBzdG9wLWNvbG9yPSIjOWM2ZGVmIiAvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2E2N2FmNCIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48ZyBpZD0iYWU4MjQ3MGQtN2E2Yy00ZGZlLTg1MzMtNTlkOGZmOTQ4NjI5Ij48Zz48cGF0aCBkPSJNOC42MTcsOC42NDRILjYzOVYxLjc4NEExLjE2LDEuMTYsMCwwLDEsMS43ODguNjI0SDguNjE3Wk0xLjYzLDcuNjUzaDZWMS41OTRIMS43ODhhLjE1OC4xNTgsMCwwLDAtLjE1OC4xNThoMFoiIGZpbGw9IiM5NDk0OTQiIC8+PHBhdGggZD0iTTE3LjUsOC42NDRIOS41MjNWLjYyNGg2LjgyOEExLjE2LDEuMTYsMCwwLDEsMTcuNSwxLjc4NFptLTYuOTg3LS45OTFoNlYxLjc4NGEuMTU3LjE1NywwLDAsMC0uMTIzLS4xODcuMi4yLDAsMCwwLS4wMzUsMEgxMC41MTNaIiBmaWxsPSIjOTQ5NDk0IiAvPjxwYXRoIGQ9Ik04LjYxNywxNy40ODVIMS43ODhBMS4xNDksMS4xNDksMCwwLDEsLjYzOSwxNi4zNDdWOS40NzZIOC42MTdaTTEuNjMsMTAuNDY3djUuODhhLjE1OC4xNTgsMCwwLDAsLjE1OC4xNThINy42MjZWMTAuNDY3WiIgZmlsbD0iIzk0OTQ5NCIgLz48cGF0aCBkPSJNMTYuMzUxLDE3LjQ4NUg5LjUyM1Y5LjQ3NkgxNy41djYuODcxQTEuMTQ5LDEuMTQ5LDAsMCwxLDE2LjM1MSwxNy40ODVabS01LjgzOC0uOTkxaDUuODM4YS4xNTcuMTU3LDAsMCwwLC4xNTgtLjE1OFYxMC40NjdoLTZaIiBmaWxsPSIjOTQ5NDk0IiAvPjxwYXRoIGQ9Ik0xNC42LDYuMjk0YS4yOTQuMjk0LDAsMCwwLS4yLS4yNzhMOS4wNDQsNC4yMDVBLjEyOC4xMjgsMCwwLDAsOSw0LjJIOWEuMTMyLjEzMiwwLDAsMC0uMTMzLjEzM3Y5LjQ0NUEuMTMzLjEzMywwLDAsMCw5LDEzLjkxMUg5YS4xMzguMTM4LDAsMCwwLC4wNDktLjAxbDUuMzY1LTIuMTQ1YS4yOTIuMjkyLDAsMCwwLC4xODQtLjI3MloiIGZpbGw9InVybCgjYTNhNDQwOTMtYjE1Ny00MjZlLWE4ZmUtY2VjOWY5YzIzOTc4KSIgLz48cGF0aCBkPSJNOC45NjYsNC4ybC01LjI5My45NjZhLjE2MS4xNjEsMCwwLDAtLjEzLjE1OFYxMi42M2EuMTYuMTYsMCwwLDAsLjEyNi4xNTdMOC45NjIsMTMuOTFhLjE2MS4xNjEsMCwwLDAsLjE5MS0uMTIxLjIyLjIyLDAsMCwwLDAtLjAzNlY0LjM1OEEuMTYuMTYsMCwwLDAsOSw0LjIuMTYzLjE2MywwLDAsMCw4Ljk2Niw0LjJaIiBmaWxsPSJ1cmwoI2FkODM4ODU5LTAzZjQtNDcyZi04MWJjLWViYzkyMWQ3MTMzNSkiIC8+PHBhdGggZD0iTTYuNTIsNS42NTZ2Ni44bDEuODQyLjNWNS4zMzVabS0yLjI2Mi4zNjd2NS45NTVsMS42LjMyNlY1Ljc1NFoiIGZpbGw9IiNiNzk2ZjkiIG9wYWNpdHk9IjAuNSIgLz48L2c+PC9nPjwvc3ZnPg==" width="22" height="22"/>
+    <text x="30" y="16" font-family="Segoe UI,Inter,sans-serif" font-size="12" font-weight="600" fill="#e5e7eb">Container Apps Environment</text>
   </g>
-
-  <!-- ============== Subscription boundary ============== -->
-  <g transform="translate(510, 200)">
-    <rect width="800" height="600" rx="14" fill="#FFFFFF" stroke="#0078D4" stroke-width="1.5" filter="url(#cardShadow)"/>
-    <rect width="800" height="40" rx="14" fill="#0078D4"/>
-    <rect y="20" width="800" height="20" fill="#0078D4"/>
-    <text x="20" y="26" font-size="12" font-weight="600" fill="#FFFFFF" letter-spacing="0.5">⌬  AZURE SUBSCRIPTION · Microsoft Entra ID</text>
-    <text x="780" y="26" font-size="11" fill="#FFFFFF" text-anchor="end" opacity="0.9">East Asia (Express) · West Europe (Flex)</text>
-
-    <!-- Resource Group -->
-    <g transform="translate(20, 56)">
-      <rect width="760" height="528" rx="10" fill="#F3F9FD" stroke="#0078D4" stroke-width="1" stroke-dasharray="6,4"/>
-      <text x="14" y="22" font-size="12" font-weight="600" fill="#0078D4" letter-spacing="0.4">▣  RESOURCE GROUP — rg-myapp</text>
+  <text x="1246" y="294" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" letter-spacing="1.4" fill="#94a3b8">COMPUTE · EXPRESS MODE</text>
+  <text x="694" y="318" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#64748b">managedEnvironments · environmentMode = express · scale-to-zero</text>
+</g>
+<g>
+<rect x="710" y="340" width="240" height="110" rx="10" fill="#111827" stroke="#1f2937"/>
+<rect x="710" y="340" width="240" height="3" rx="2" fill="#0078D4"/>
+<image href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImIyN2YxYWQwLTdkMTEtNDI0Ny05ZGEzLTkxYmNlNjIxMWYzMiIgeDE9IjguNzk4IiB5MT0iOC43MDMiIHgyPSIxNC42ODMiIHkyPSI4LjcwMyIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMC4wMDEiIHN0b3AtY29sb3I9IiM3NzNhZGMiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjNTUyZjk5IiAvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJiMmY5MjExMi00Y2E5LTRiMTctYTAxOS1jOWYyNmMxYTRhOGYiIHgxPSI1Ljc2NCIgeTE9IjMuNzc3IiB4Mj0iNS43NjQiIHkyPSIxMy43OCIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2E2N2FmNCIgLz48c3RvcCBvZmZzZXQ9IjAuOTk5IiBzdG9wLWNvbG9yPSIjNzczYWRjIiAvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjxnIGlkPSJiOGEwNDg2YS01NTAxLTRkOTItYjU0MC1hNzY2YzRiM2I1NDgiPjxnPjxnPjxnPjxwYXRoIGQ9Ik0xNi45MzIsMTEuNTc4YTguNDQ4LDguNDQ4LDAsMCwxLTcuOTUsNS41OSw4LjE1LDguMTUsMCwwLDEtMi4zMy0uMzMsMi4xMzMsMi4xMzMsMCwwLDAsLjE4LS44M2MuMDEsMCwuMDMuMDEuMDQuMDFhNy40MjIsNy40MjIsMCwwLDAsMi4xMS4zLDcuNjQ2LDcuNjQ2LDAsMCwwLDYuODUtNC4yOGwuMDEtLjAxWiIgZmlsbD0iIzMyYmVkZCIgLz48cGF0aCBkPSJNMy41ODIsMTQuMDY4YTIuMDI1LDIuMDI1LDAsMCwwLS42NC41Niw4LjYsOC42LDAsMCwxLTEuNjctMi40NGwxLjA0LjIzdi4yNmEuNi42LDAsMCwwLC40Ny41OWwuMTQuMDNhNi4xMzYsNi4xMzYsMCwwLDAsLjYyLjczWiIgZmlsbD0iIzMyYmVkZCIgLz48cGF0aCBkPSJNMTIuMzUyLjk1OGEyLjI4LDIuMjgsMCwwLDAtLjI3LjgxYy0uMDItLjAxLS4wNS0uMDItLjA3LS4wM2E3LjQ3OSw3LjQ3OSwwLDAsMC0zLjAzLS42Myw3LjY0Myw3LjY0MywwLDAsMC01LjksMi44bC0uMjkuMDZhLjYuNiwwLDAsMC0uNDguNTh2LjQ2bC0xLjAyLjE5QTguNDU0LDguNDU0LDAsMCwxLDguOTgyLjI2OCw4LjYsOC42LDAsMCwxLDEyLjM1Mi45NThaIiBmaWxsPSIjMzJiZWRkIiAvPjxwYXRoIGQ9Ik0xNi44NzIsNS43bC0xLjA5LS4zOGE2LjYsNi42LDAsMCwwLS43Mi0xLjE2Yy0uMDItLjAzLS4wNC0uMDUtLjA1LS4wN2EyLjA4MywyLjA4MywwLDAsMCwuNzItLjQ1QTcuODEsNy44MSwwLDAsMSwxNi44NzIsNS43WiIgZmlsbD0iIzMyYmVkZCIgLz48cGF0aCBkPSJNMTAuMDcyLDExLjkwOGwyLjU0LjU2TDguNjcyLDE0LjFjLS4wMiwwLS4wMy4wMS0uMDUuMDFhLjE1NC4xNTQsMCwwLDEtLjE1LS4xNVYzLjQ0OGEuMTU0LjE1NCwwLDAsMSwuMTUtLjE1LjA5LjA5LDAsMCwxLC4wNS4wMWw0LjQ2LDEuNTYtMy4wNS41N2EuNTY1LjU2NSwwLDAsMC0uNDQuNTR2NS40QS41MzcuNTM3LDAsMCwwLDEwLjA3MiwxMS45MDhaIiBmaWxsPSIjZmZmIiAvPjxnPjxnIGlkPSJlOTE4ZjI4Ni01MDMyLTQ5NDItYWQyOS1lYTE3ZTZmMWNjOTAiPjxwYXRoIGQ9Ik0xLjEsNS42NjhsMS4yMS0uMjN2Ni41NWwtMS4yMy0uMjctLjk5LS4yMmEuMTExLjExMSwwLDAsMS0uMDktLjEydi01LjRhLjEyLjEyLDAsMCwxLC4wOS0uMTJaIiBmaWxsPSIjYTY3YWY0IiAvPjwvZz48Zz48ZyBpZD0iYTQ3YTk5ZGQtNGQ0Ny00YzcwLThjNDItYzVhYzI3NGNlNDk2Ij48Zz48cGF0aCBkPSJNMTAuMDcyLDExLjkwOGwyLjU0LjU2TDguNjcyLDE0LjFjLS4wMiwwLS4wMy4wMS0uMDUuMDFhLjE1NC4xNTQsMCwwLDEtLjE1LS4xNVYzLjQ0OGEuMTU0LjE1NCwwLDAsMSwuMTUtLjE1LjA5LjA5LDAsMCwxLC4wNS4wMWw0LjQ2LDEuNTYtMy4wNS41N2EuNTY1LjU2NSwwLDAsMC0uNDQuNTR2NS40QS41MzcuNTM3LDAsMCwwLDEwLjA3MiwxMS45MDhaIiBmaWxsPSJ1cmwoI2IyN2YxYWQwLTdkMTEtNDI0Ny05ZGEzLTkxYmNlNjIxMWYzMikiIC8+PHBhdGggZD0iTTguNTg2LDMuMywyLjg3OCw0LjM3OGEuMTc3LjE3NywwLDAsMC0uMTQuMTc1VjEyLjY4YS4xNzcuMTc3LDAsMCwwLC4xMzcuMTc0TDguNTgxLDE0LjFhLjE3Ni4xNzYsMCwwLDAsLjIxLS4xNzRWMy40NzhBLjE3NS4xNzUsMCwwLDAsOC42MTksMy4zWiIgZmlsbD0idXJsKCNiMmY5MjExMi00Y2E5LTRiMTctYTAxOS1jOWYyNmMxYTRhOGYpIiAvPjwvZz48L2c+PHBvbHlnb24gcG9pbnRzPSI1Ljk0OCA0LjkyMSA1Ljk0OCAxMi40ODMgNy45MzQgMTIuODE0IDcuOTM0IDQuNTY0IDUuOTQ4IDQuOTIxIiBmaWxsPSIjYjc5NmY5IiBvcGFjaXR5PSIwLjUiIC8+PHBvbHlnb24gcG9pbnRzPSIzLjUwOSA1LjMyOSAzLjUwOSAxMS45NTQgNS4yMzggMTIuMzE3IDUuMjM4IDUuMDMxIDMuNTA5IDUuMzI5IiBmaWxsPSIjYjc5NmY5IiBvcGFjaXR5PSIwLjUiIC8+PC9nPjwvZz48L2c+PHBhdGggZD0iTTE2LDIuMDQ4YTEuNzU1LDEuNzU1LDAsMSwxLTEuNzYtMS43NkExLjc1NiwxLjc1NiwwLDAsMSwxNiwyLjA0OFoiIGZpbGw9IiMzMmJlZGQiIC8+PGNpcmNsZSBjeD0iNC42NSIgY3k9IjE1Ljk3MyIgcj0iMS43NTkiIGZpbGw9IiMzMmJlZGQiIC8+PC9nPjxwYXRoIGQ9Ik0xOCw2LjY4OXYzLjg0NGEuMjIyLjIyMiwwLDAsMS0uMTMzLjJsLS43NjYuMzE2LTMuMDcsMS4yNjgtLjAxMSwwYS4xMjYuMTI2LDAsMCwxLS4wMzgsMCwuMS4xLDAsMCwxLS4xLS4xVjUuMjM0YS4xLjEsMCwwLDEsLjA1NC0uMDg4bDAsMCwuMDE5LDBhLjAzMS4wMzEsMCwwLDEsLjAxOSwwLC4wNTUuMDU1LDAsMCwxLC4wMzQuMDA4bC4wMTEsMCwuMDEyLDBMMTcuMDUsNi4ybC44LjI4MkEuMjEzLjIxMywwLDAsMSwxOCw2LjY4OVoiIGZpbGw9IiM3NzNhZGMiIC8+PHBhdGggZD0iTTEzLjk1OSw1LjE0bC0zLjguNzE1YS4xMTguMTE4LDAsMCwwLS4wOTMuMTE3djUuNDA5YS4xMTguMTE4LDAsMCwwLC4wOTEuMTE2bDMuOC44MzFhLjExNS4xMTUsMCwwLDAsLjEzNy0uMDkuMTA5LjEwOSwwLDAsMCwwLS4wMjZWNS4yNTZhLjExNy4xMTcsMCwwLDAtLjExNS0uMTE4QS4wODIuMDgyLDAsMCwwLDEzLjk1OSw1LjE0WiIgZmlsbD0iI2E2N2FmNCIgLz48L2c+PC9nPjwvc3ZnPg==" x="724" y="354" width="36" height="36"/>
+<text x="936" y="364" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" fill="#94a3b8" letter-spacing="1.4">API</text>
+<text x="724" y="420" font-family="Segoe UI,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e7eb">Container App</text>
+<text x="724" y="438" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">myapp-api · 0–2 replicas</text>
+</g>
+<g>
+      <rect x="692.0" y="470" width="130" height="32" rx="16" fill="#1e293b" stroke="#1f2937"/>
+      <text x="706.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#50E6FF">⚡</text>
+      <text x="726.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">0.5 vCPU · 2 GiB</text>
     </g>
-  </g>
-
-  <!-- ============== Service tiles inside RG ============== -->
-
-  <!-- Row 1: ACR -->
-  <g transform="translate(556, 290)" filter="url(#cardShadow)">
-    <rect width="220" height="150" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 18)">
-      <rect width="48" height="48" rx="6" fill="url(#azBlue)"/>
-      <path d="M 10 20 L 24 12 L 38 20 L 38 38 L 24 46 L 10 38 Z" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-      <path d="M 10 20 L 24 28 L 38 20 M 24 28 L 24 46" stroke="#FFFFFF" stroke-width="1.6" fill="none"/>
+<g>
+      <rect x="834.0" y="470" width="130" height="32" rx="16" fill="#1e293b" stroke="#1f2937"/>
+      <text x="848.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#50E6FF">↗</text>
+      <text x="868.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">Scale 0 → 2</text>
     </g>
-    <text x="84" y="30" font-size="10" fill="#8A8886" letter-spacing="0.4">CONTAINERS</text>
-    <text x="84" y="48" font-size="13" font-weight="600" fill="#323130">Container Registry</text>
-    <text x="84" y="64" font-size="11" fill="#605E5C">myappacr.azurecr.io</text>
-    <line x1="20" y1="92" x2="200" y2="92" stroke="#E5E9F0"/>
-    <text x="20" y="112" font-size="11" fill="#605E5C">Image built via az acr build</text>
-    <text x="20" y="128" font-size="11" fill="#605E5C">myapp:latest · linux/amd64</text>
-    <text x="20" y="144" font-size="10" fill="#00A4A4" font-weight="600">No local Docker daemon</text>
-  </g>
-
-  <!-- Container Apps environment (Express) -->
-  <g transform="translate(796, 290)" filter="url(#cardShadow)">
-    <rect width="496" height="350" rx="8" fill="#F8FAFC" stroke="#0078D4" stroke-width="1.5"/>
-    <rect width="496" height="36" rx="8" fill="#0078D4"/>
-    <rect y="20" width="496" height="16" fill="#0078D4"/>
-    <text x="18" y="23" font-size="11" font-weight="600" fill="#FFFFFF" letter-spacing="0.5">CONTAINER APPS ENVIRONMENT</text>
-    <text x="478" y="23" font-size="11" fill="#FFFFFF" text-anchor="end" opacity="0.9">environmentMode = Express</text>
-
-    <!-- backend app -->
-    <g transform="translate(20, 60)">
-      <rect width="456" height="120" rx="6" fill="#FFFFFF" stroke="#E5E9F0"/>
-      <g transform="translate(16, 16)">
-        <rect width="56" height="56" rx="6" fill="url(#azBlue)"/>
-        <rect x="12" y="16" width="32" height="7" rx="1" fill="#FFFFFF" opacity="0.95"/>
-        <rect x="12" y="25" width="32" height="7" rx="1" fill="#FFFFFF" opacity="0.85"/>
-        <rect x="12" y="34" width="32" height="7" rx="1" fill="#FFFFFF" opacity="0.75"/>
-      </g>
-      <text x="88" y="30" font-size="10" fill="#8A8886" letter-spacing="0.4">COMPUTE · CONTAINER APP</text>
-      <text x="88" y="50" font-size="14" font-weight="600" fill="#323130">ca-myapp  <tspan font-weight="400" fill="#605E5C" font-size="11">(backend)</tspan></text>
-      <text x="88" y="68" font-size="11" fill="#605E5C">Any OCI image · FastAPI, Node, Go, .NET</text>
-
-      <!-- metric chips -->
-      <g transform="translate(88, 80)">
-        <rect width="110" height="28" rx="14" fill="#F3F9FD" stroke="#CCE4F7"/>
-        <text x="55" y="18" font-size="11" fill="#0078D4" font-weight="600" text-anchor="middle">0.5 vCPU · 2 Gi</text>
-      </g>
-      <g transform="translate(206, 80)">
-        <rect width="100" height="28" rx="14" fill="#F3F9FD" stroke="#CCE4F7"/>
-        <text x="50" y="18" font-size="11" fill="#0078D4" font-weight="600" text-anchor="middle">replicas 0–2</text>
-      </g>
-      <g transform="translate(314, 80)">
-        <rect width="124" height="28" rx="14" fill="#EFFCF7" stroke="#A8E6D4"/>
-        <text x="62" y="18" font-size="11" fill="#00A4A4" font-weight="600" text-anchor="middle">cold start &lt; 1 s</text>
-      </g>
+<g>
+      <rect x="976.0" y="470" width="130" height="32" rx="16" fill="#1e293b" stroke="#1f2937"/>
+      <text x="990.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#50E6FF">🔒</text>
+      <text x="1010.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">mTLS · Managed cert</text>
     </g>
-
-    <!-- ingress -->
-    <g transform="translate(20, 196)">
-      <rect width="456" height="64" rx="6" fill="#FFFFFF" stroke="#E5E9F0"/>
-      <g transform="translate(16, 12)">
-        <rect width="40" height="40" rx="6" fill="url(#azTeal)"/>
-        <path d="M 20 9 L 31 20 L 20 31 L 9 20 Z" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-        <circle cx="20" cy="20" r="4" fill="#FFFFFF"/>
-      </g>
-      <text x="68" y="22" font-size="10" fill="#8A8886" letter-spacing="0.4">INGRESS · MANAGED CERTIFICATE · HTTPS</text>
-      <text x="68" y="40" font-size="12" font-weight="600" fill="#323130">ca-myapp.<tspan fill="#0078D4">eastasia.azurecontainerapps.io</tspan></text>
-      <text x="68" y="56" font-size="10" fill="#605E5C">Per-second billing · scale-to-zero · ≈ $0 idle</text>
+<g>
+      <rect x="1118.0" y="470" width="130" height="32" rx="16" fill="#1e293b" stroke="#1f2937"/>
+      <text x="1132.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#50E6FF">⏱</text>
+      <text x="1152.0" y="491" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">&lt;1s cold start</text>
     </g>
-
-    <!-- env footer -->
-    <g transform="translate(20, 276)">
-      <rect width="456" height="58" rx="6" fill="#FFFFFF" stroke="#E5E9F0"/>
-      <text x="18" y="24" font-size="11" font-weight="600" fill="#605E5C" letter-spacing="0.4">ENV PROPERTIES</text>
-      <text x="18" y="44" font-size="11" fill="#605E5C">No env config · sandbox capacity · Log Analytics: none (preview)</text>
-    </g>
-  </g>
-
-  <!-- Row 2 left: SWA -->
-  <g transform="translate(556, 460)" filter="url(#cardShadow)">
-    <rect width="220" height="180" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 18)">
-      <rect width="48" height="48" rx="6" fill="url(#azCyan)"/>
-      <circle cx="24" cy="24" r="14" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-      <ellipse cx="24" cy="24" rx="6" ry="14" fill="none" stroke="#FFFFFF" stroke-width="1.8"/>
-      <line x1="10" y1="24" x2="38" y2="24" stroke="#FFFFFF" stroke-width="1.8"/>
-    </g>
-    <text x="84" y="30" font-size="10" fill="#8A8886" letter-spacing="0.4">WEB</text>
-    <text x="84" y="48" font-size="13" font-weight="600" fill="#323130">Static Web Apps</text>
-    <text x="84" y="64" font-size="11" fill="#605E5C">Next.js · React · Astro · plain HTML</text>
-    <line x1="20" y1="92" x2="200" y2="92" stroke="#E5E9F0"/>
-    <text x="20" y="112" font-size="11" fill="#605E5C">Free tier · global CDN</text>
-    <text x="20" y="128" font-size="11" fill="#605E5C">Proxies /api/* → ACA</text>
-    <text x="20" y="146" font-size="10" fill="#0078D4" font-weight="600">swa-myapp.azurestaticapps.net</text>
-    <text x="20" y="162" font-size="10" fill="#605E5C">GitHub Actions wired by SWA</text>
-  </g>
-
-  <!-- Row 2 right: Postgres -->
-  <g transform="translate(796, 660)" filter="url(#cardShadow)">
-    <rect width="240" height="130" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 18)">
-      <rect width="48" height="48" rx="6" fill="url(#azPg)"/>
-      <ellipse cx="24" cy="16" rx="13" ry="4" fill="#FFFFFF"/>
-      <path d="M 11 16 L 11 34 Q 11 38 24 38 Q 37 38 37 34 L 37 16" fill="#FFFFFF"/>
-      <path d="M 11 24 Q 24 28 37 24" fill="none" stroke="#336791" stroke-width="1"/>
-    </g>
-    <text x="84" y="30" font-size="10" fill="#8A8886" letter-spacing="0.4">DATABASES</text>
-    <text x="84" y="48" font-size="13" font-weight="600" fill="#323130">Azure Database for</text>
-    <text x="84" y="64" font-size="13" font-weight="600" fill="#323130">PostgreSQL Flexible</text>
-    <line x1="20" y1="86" x2="220" y2="86" stroke="#E5E9F0"/>
-    <text x="20" y="104" font-size="11" fill="#605E5C">B1ms · 32 GB · TLS 1.2+</text>
-    <text x="20" y="122" font-size="11" fill="#605E5C">DATABASE_URL → ACA secret</text>
-  </g>
-
-  <!-- Log Analytics -->
-  <g transform="translate(1052, 660)" filter="url(#cardShadow)">
-    <rect width="240" height="130" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 18)">
-      <rect width="48" height="48" rx="6" fill="url(#azIndigo)"/>
-      <polyline points="10,38 18,26 25,32 33,16 40,24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linejoin="round"/>
-      <line x1="10" y1="38" x2="40" y2="38" stroke="#FFFFFF" stroke-width="1.8"/>
-    </g>
-    <text x="84" y="30" font-size="10" fill="#8A8886" letter-spacing="0.4">MONITOR</text>
-    <text x="84" y="48" font-size="13" font-weight="600" fill="#323130">Log Analytics +</text>
-    <text x="84" y="64" font-size="13" font-weight="600" fill="#323130">Application Insights</text>
-    <line x1="20" y1="86" x2="220" y2="86" stroke="#E5E9F0"/>
-    <text x="20" y="104" font-size="11" fill="#605E5C">deploy-azure logs --tail</text>
-    <text x="20" y="122" font-size="11" fill="#605E5C">KQL · alerts · dashboards</text>
-  </g>
-
-  <!-- ============== End user column ============== -->
-  <g transform="translate(1372, 290)" filter="url(#cardShadow)">
-    <rect width="200" height="160" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 22)">
-      <circle cx="22" cy="18" r="11" fill="#0078D4"/>
-      <path d="M 4 56 Q 4 36 22 36 Q 40 36 40 56 Z" fill="#0078D4"/>
-    </g>
-    <text x="86" y="36" font-size="14" font-weight="600" fill="#323130">End user</text>
-    <text x="86" y="54" font-size="11" fill="#605E5C">Browser · mobile</text>
-    <text x="86" y="68" font-size="11" fill="#605E5C">agent · MCP client</text>
-    <line x1="20" y1="92" x2="180" y2="92" stroke="#E5E9F0"/>
-    <text x="20" y="112" font-size="10" fill="#0078D4" font-weight="600">https://app.example.com</text>
-    <text x="20" y="128" font-size="10" fill="#605E5C">Custom domain bound by</text>
-    <text x="20" y="142" font-size="10" fill="#605E5C">deploy-azure domain add</text>
-  </g>
-
-  <!-- Custom domain card under end-user -->
-  <g transform="translate(1372, 470)" filter="url(#cardShadow)">
-    <rect width="200" height="120" rx="8" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 18)">
-      <rect width="48" height="48" rx="6" fill="url(#azTeal)"/>
-      <text x="24" y="32" font-size="14" font-weight="700" fill="#FFFFFF" text-anchor="middle">DNS</text>
-    </g>
-    <text x="84" y="30" font-size="10" fill="#8A8886" letter-spacing="0.4">NETWORKING</text>
-    <text x="84" y="48" font-size="13" font-weight="600" fill="#323130">Custom domain</text>
-    <text x="84" y="64" font-size="11" fill="#605E5C">CNAME → SWA / ACA</text>
-    <line x1="20" y1="88" x2="180" y2="88" stroke="#E5E9F0"/>
-    <text x="20" y="106" font-size="10" fill="#605E5C">Free TLS · Azure managed cert</text>
-  </g>
-
-  <!-- ============== Arrows ============== -->
-
-  <!-- azure.toml -> CLI -->
-  <line x1="248" y1="430" x2="270" y2="370" stroke="#605E5C" stroke-width="1.6" stroke-dasharray="4,3" marker-end="url(#arrowSlate)"/>
-
-  <!-- Developer -> CLI -->
-  <line x1="248" y1="270" x2="270" y2="270" stroke="#605E5C" stroke-width="1.6" marker-end="url(#arrowSlate)"/>
-
-  <!-- CLI -> Subscription (control-plane) -->
-  <path d="M 490 374 C 500 374, 502 230, 510 230" fill="none" stroke="#605E5C" stroke-width="1.8" marker-end="url(#arrowSlate)"/>
-  <text x="498" y="220" font-size="10" fill="#605E5C">PUT/GET · ARM</text>
-
-  <!-- ACR -> ACA (image pull) clean horizontal -->
-  <line x1="776" y1="365" x2="796" y2="365" stroke="#D83B01" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowOrange)"/>
-  <text x="780" y="357" font-size="10" fill="#D83B01" font-weight="600">pull</text>
-
-  <!-- SWA -> ACA (api proxy) — vertical up -->
-  <path d="M 666 460 L 666 350 L 796 350" fill="none" stroke="#0078D4" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="672" y="404" font-size="10" fill="#0078D4" font-weight="600">/api/*</text>
-
-  <!-- ACA -> Postgres (clean down) -->
-  <path d="M 916 640 L 916 660" fill="none" stroke="#00A4A4" stroke-width="2" marker-end="url(#arrowTeal)"/>
-  <text x="922" y="654" font-size="10" fill="#00A4A4">5432 · TLS</text>
-
-  <!-- ACA -> Log analytics -->
-  <path d="M 1172 640 L 1172 660" fill="none" stroke="#605E5C" stroke-width="1.6" stroke-dasharray="3,3" marker-end="url(#arrowSlate)"/>
-  <text x="1180" y="654" font-size="10" fill="#605E5C">stdout</text>
-
-  <!-- ACA -> End user (out of subscription) -->
-  <path d="M 1292 350 L 1372 350" fill="none" stroke="#0078D4" stroke-width="2" marker-end="url(#arrow)"/>
-  <text x="1300" y="342" font-size="10" fill="#0078D4" font-weight="600">HTTPS</text>
-
-  <!-- SWA -> End user too (CDN delivery) -->
-  <path d="M 776 530 C 1200 530, 1280 510, 1372 510" fill="none" stroke="#0078D4" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
-  <text x="1100" y="522" font-size="10" fill="#0078D4">static assets via CDN</text>
-
-  <!-- Custom domain -> SWA / ACA (downward decoration) -->
-  <line x1="1472" y1="470" x2="1472" y2="450" stroke="#00A4A4" stroke-width="1.4" stroke-dasharray="3,3"/>
-
-  <!-- ============== Legend ============== -->
-  <g transform="translate(48, 850)">
-    <rect width="1504" height="44" rx="6" fill="#FFFFFF" stroke="#E5E9F0"/>
-    <g transform="translate(20, 14)">
-      <rect width="16" height="16" rx="3" fill="url(#azBlue)"/>
-      <text x="24" y="13" font-size="11" fill="#323130">Microsoft Azure service</text>
-    </g>
-    <g transform="translate(220, 14)">
-      <line x1="0" y1="8" x2="26" y2="8" stroke="#0078D4" stroke-width="2" marker-end="url(#arrow)"/>
-      <text x="32" y="13" font-size="11" fill="#323130">User / app HTTPS</text>
-    </g>
-    <g transform="translate(390, 14)">
-      <line x1="0" y1="8" x2="26" y2="8" stroke="#00A4A4" stroke-width="2" marker-end="url(#arrowTeal)"/>
-      <text x="32" y="13" font-size="11" fill="#323130">Backend → DB</text>
-    </g>
-    <g transform="translate(540, 14)">
-      <line x1="0" y1="8" x2="26" y2="8" stroke="#D83B01" stroke-width="2" stroke-dasharray="5,3" marker-end="url(#arrowOrange)"/>
-      <text x="32" y="13" font-size="11" fill="#323130">Image pull</text>
-    </g>
-    <g transform="translate(670, 14)">
-      <line x1="0" y1="8" x2="26" y2="8" stroke="#605E5C" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrowSlate)"/>
-      <text x="32" y="13" font-size="11" fill="#323130">Telemetry · control plane</text>
-    </g>
-    <g transform="translate(890, 14)">
-      <rect width="16" height="16" rx="3" fill="#F3F9FD" stroke="#0078D4" stroke-dasharray="4,3"/>
-      <text x="24" y="13" font-size="11" fill="#323130">Azure resource group</text>
-    </g>
-    <text x="1484" y="26" font-size="10" fill="#8A8886" text-anchor="end">© Microsoft logo per Trademark &amp; Brand Guidelines · referential use</text>
-  </g>
+<g>
+<rect x="400" y="710" width="220" height="110" rx="10" fill="#111827" stroke="#1f2937"/>
+<rect x="400" y="710" width="220" height="3" rx="2" fill="#0078D4"/>
+<image href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImU2YWQ0ZGY5LTBhYjctNGI0OS05NzA2LTYyMGI0MjM4MGYwYiIgeDE9IjkiIHkxPSIxNi4yMzYiIHgyPSI5IiB5Mj0iNS41OTkiIGdyYWRpZW50VW5pdHM9InVzZXJTcGFjZU9uVXNlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiMwMDViYTEiIC8+PHN0b3Agb2Zmc2V0PSIwLjc3NSIgc3RvcC1jb2xvcj0iIzAwNzhkNCIgLz48L2xpbmVhckdyYWRpZW50PjwvZGVmcz48ZyBpZD0iZTc4ODViOWMtOTcxNC00Mjc2LWJkNDEtNTkxY2I3ZTA4NmE1Ij48cGF0aCBkPSJNMCw1LjZIMThhMCwwLDAsMCwxLDAsMFYxNS42MzVhLjYuNiwwLDAsMS0uNi42SC42YS42LjYsMCwwLDEtLjYtLjZWNS42QTAsMCwwLDAsMSwwLDUuNloiIGZpbGw9InVybCgjZTZhZDRkZjktMGFiNy00YjQ5LTk3MDYtNjIwYjQyMzgwZjBiKSIgLz48cmVjdCB4PSIxLjMwOSIgeT0iNi42NTciIHdpZHRoPSIxNS41MjciIGhlaWdodD0iOC41MTQiIHJ4PSIwLjYiIGZpbGw9IiM1ZWEwZWYiIG9wYWNpdHk9IjAuNiIgLz48cGF0aCBkPSJNLjYsMS43NjRIMTcuNGEuNi42LDAsMCwxLC42LjZWNS42YTAsMCwwLDAsMSwwLDBIMGEwLDAsMCwwLDEsMCwwVjIuMzY1QS42LjYsMCwwLDEsLjYsMS43NjRaIiBmaWxsPSIjMDA1YmExIiAvPjxwYXRoIGQ9Ik03LjEwOSwxMy4yMTdsLS4zMjEuMzJhLjE0NC4xNDQsMCwwLDEtLjIwNSwwTDQuMjU4LDExLjIwNWEuMjkuMjksMCwwLDEsMC0uNDFsLjMyMS0uMzJMNy4xMSwxMy4wMTJBLjE0NS4xNDUsMCwwLDEsNy4xMDksMTMuMjE3Wm0zLjY1MywwLC4zMjEuMzJhLjE0NC4xNDQsMCwwLDAsLjIwNSwwbDIuMzI1LTIuMzMyYS4yOS4yOSwwLDAsMCwwLS40MWwtLjMyMi0uMzItMi41MywyLjUzN0EuMTQ1LjE0NSwwLDAsMCwxMC43NjIsMTMuMjE3WiIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iMC44IiAvPjxwYXRoIGQ9Ik02LjgzMSw4LjQzM2wuMzIuMzIxYS4xNDQuMTQ0LDAsMCwxLDAsLjIwNUw0LjU3NiwxMS41MjdsLS4zMi0uMzIyYS4yODkuMjg5LDAsMCwxLDAtLjQxbDIuMzctMi4zNjNBLjE0NS4xNDUsMCwwLDEsNi44MzEsOC40MzNabTQuMjA3LDAtLjMyLjMyMWEuMTQ0LjE0NCwwLDAsMCwwLC4yMDVsMi41NzUsMi41NjguMzItLjMyMWEuMjkyLjI5MiwwLDAsMCwwLS40MTFsLTIuMzctMi4zNjJBLjE0NC4xNDQsMCwwLDAsMTEuMDM4LDguNDM0WiIgZmlsbD0iI2ZmZiIgLz48cGF0aCBkPSJNOC4xNTksMTQuMzYzLDcuNjQ2LDE0LjJhLjEwNS4xMDUsMCwwLDEtLjA2Ny0uMTMxTDkuNjY5LDcuNTRhLjEuMSwwLDAsMSwuMTMtLjA2N2wuNTEzLjE2NGEuMS4xLDAsMCwxLC4wNjcuMTNMOC4yODksMTQuM0EuMS4xLDAsMCwxLDguMTU5LDE0LjM2M1oiIGZpbGw9IiNmZmYiIC8+PHBhdGggZD0iTTMuMTY2LDMuODQ3YS43Ni43NiwwLDEsMS0uNzYtLjc2QS43Ni43NiwwLDAsMSwzLjE2NiwzLjg0N1pNNC44LDMuMDg3YS43Ni43NiwwLDEsMCwuNzYuNzZBLjc2Ljc2LDAsMCwwLDQuOCwzLjA4N1ptMi4zOTMsMGEuNzYuNzYsMCwxLDAsLjc2Ljc2QS43Ni43NiwwLDAsMCw3LjE5MSwzLjA4N1oiIGZpbGw9IiNmZmYiIC8+PC9nPjwvc3ZnPg==" x="414" y="724" width="36" height="36"/>
+<text x="606" y="734" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" fill="#94a3b8" letter-spacing="1.4">WEB</text>
+<text x="414" y="790" font-family="Segoe UI,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e7eb">Static Web Apps</text>
+<text x="414" y="808" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">myapp-web · global CDN</text>
+</g>
+<g>
+<rect x="720" y="710" width="220" height="110" rx="10" fill="#111827" stroke="#1f2937"/>
+<rect x="720" y="710" width="220" height="3" rx="2" fill="#0078D4"/>
+<image href="data:image/svg+xml;base64,PHN2ZyBpZD0iZmM4OTAxMjctNzI4Yi00YWMwLWI1ZGEtODZjZGZjMTkxZTg2IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImEyOGRlZTIwLTRjNzEtNDZiNS1iOTU3LTgwNGM2N2RhNzI1YSIgeDE9IjIuNDQiIHkxPSIxMC42NyIgeDI9IjE1LjI3IiB5Mj0iMTAuNjciIGdyYWRpZW50VHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4xNCAtMC41KSByb3RhdGUoLTAuMDEpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMDA1YmExIiAvPjxzdG9wIG9mZnNldD0iMC4wNyIgc3RvcC1jb2xvcj0iIzAwNjBhOSIgLz48c3RvcCBvZmZzZXQ9IjAuMzYiIHN0b3AtY29sb3I9IiMwMDcxYzgiIC8+PHN0b3Agb2Zmc2V0PSIwLjUyIiBzdG9wLWNvbG9yPSIjMDA3OGQ0IiAvPjxzdG9wIG9mZnNldD0iMC42NCIgc3RvcC1jb2xvcj0iIzAwNzRjZCIgLz48c3RvcCBvZmZzZXQ9IjAuODIiIHN0b3AtY29sb3I9IiMwMDZhYmIiIC8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDA1YmExIiAvPjwvbGluZWFyR3JhZGllbnQ+PC9kZWZzPjx0aXRsZT5JY29uLWRhdGFiYXNlcy0xMzE8L3RpdGxlPjxwYXRoIGQ9Ik05LDUuMTRjLTMuNTQsMC02LjQxLTEtNi40MS0yLjMyVjE1LjE4YzAsMS4yNywyLjgyLDIuMyw2LjMyLDIuMzJIOWMzLjU0LDAsNi40MS0xLDYuNDEtMi4zMlYyLjgyQzE1LjQxLDQuMSwxMi41NCw1LjE0LDksNS4xNFoiIGZpbGw9InVybCgjYTI4ZGVlMjAtNGM3MS00NmI1LWI5NTctODA0YzY3ZGE3MjVhKSIgLz48cGF0aCBkPSJNMTUuNDEsMi44MmMwLDEuMjgtMi44NywyLjMyLTYuNDEsMi4zMnMtNi40MS0xLTYuNDEtMi4zMlM1LjQ2LjUsOSwuNXM2LjQxLDEsNi40MSwyLjMyIiBmaWxsPSIjZThlOGU4IiAvPjxwYXRoIGQ9Ik0xMy45MSwyLjYzYzAsLjgyLTIuMiwxLjQ4LTQuOTEsMS40OFM0LjA4LDMuNDUsNC4wOCwyLjY0LDYuMjgsMS4xNiw5LDEuMTZzNC45MS42Niw0LjkxLDEuNDciIGZpbGw9IiM1MGU2ZmYiIC8+PHBhdGggZD0iTTksM2ExMS42NSwxMS42NSwwLDAsMC0zLjkuNTdBMTEuNTMsMTEuNTMsMCwwLDAsOSw0LjExYTExLjQ3LDExLjQ3LDAsMCwwLDMuODktLjU4QTExLjkzLDExLjkzLDAsMCwwLDksM1oiIGZpbGw9IiMxOThhYjMiIC8+PHBhdGggZD0iTTEyLDljMCwuMDgsMCwuMjQsMCwuNDJhNS4xMiw1LjEyLDAsMCwwLS4wOC42M2MwLC4xMiwwLC4zLjA1LjQ2czAsLjI3LDAsLjM2YTEuNjgsMS42OCwwLDAsMS0uMjUuODYuNDMuNDMsMCwwLDAsMCwuMDdsLjEuMTJhMTAuNTUsMTAuNTUsMCwwLDAsMS4wNi0yLjM4aDBjLjI4LS45NS4zMS0xLjYzLjA5LTEuOTJhMi41OCwyLjU4LDAsMCwwLTIuNjgtLjg2LDMuMjksMy4yOSwwLDAsMSwuOTEuNjdBMi4yOCwyLjI4LDAsMCwxLDEyLDlabS0uMzEuMDhhMS4xNSwxLjE1LDAsMCwwLS43OS4wOWMtLjI5LjE4LS4yLjU1LDAsMWE3Ljc3LDcuNzcsMCwwLDAsLjM1Ljg1bC4wOS4xNmgwYy4wNS4wOC4wOC4xNS4xMS4ybC4wOC4xM2ExLjI4LDEuMjgsMCwwLDAsLjE4LS42NSwyLjg2LDIuODYsMCwwLDAsMC0uMzNjMC0uMTcsMC0uMzYtLjA1LS40OWE2LjEsNi4xLDAsMCwxLC4wOC0uNjlDMTEuNzEsOS4yNCwxMS43Miw5LjEzLDExLjczLDkuMDVabS0uMy40MWEuNC40LDAsMCwxLS4xOC4xaDBhLjMzLjMzLDAsMCwxLS4xNCwwQS4yMy4yMywwLDAsMSwxMSw5LjRoMGMwLS4wNy4xMS0uMTMuMjQtLjE1aC4xOXMuMDksMCwuMDkuMDhBLjIuMiwwLDAsMSwxMS40Myw5LjQ2Wm0tNC42OS44OWMwLS4wNywwLS4xMywwLS4xN2ExLDEsMCwwLDAsMC0uMTcsNS41NSw1LjU1LDAsMCwxLDAtMUE1LjIyLDUuMjIsMCwwLDEsNyw3Ljk0LDIuNDEsMi40MSwwLDAsMSw3LjU4LDcsNC43OCw0Ljc4LDAsMCwwLDYuMjMsNi44YTEuODcsMS44NywwLDAsMC0xLjEuM0EyLDIsMCwwLDAsNC41LDguOTIsMTIuMjcsMTIuMjcsMCwwLDAsNSwxMS4xNmMuMzQsMS4xNC43MywxLjg0LDEuMDcsMS45NWgwYy4xNS4wNS4zMSwwLC40Ny0uMjEuMjgtLjM0LjU0LS42My42OS0uOEExLjg4LDEuODgsMCwwLDEsNi43NCwxMC4zNVptLjI2LjRhMi4xOCwyLjE4LDAsMCwwLC4wNi41NiwxLjUsMS41LDAsMCwwLC4yNi40NCwxLjA3LDEuMDcsMCwwLDAsLjM1LjI1LDEuMDksMS4wOSwwLDAsMCwuMzkuMDhjMC0uMTcuMTQtLjM4LjIzLS42YTQuMzUsNC4zNSwwLDAsMCwuMjEtLjU5LDYuNjEsNi42MSwwLDAsMCwwLTEuMTFjMC0uMDksMC0uMTktLjA2LS4zYS40NS40NSwwLDAsMC0uMTItLjI3bDAsMEEuNjYuNjYsMCwwLDAsOCw5LjA4SDcuOGExLjU2LDEuNTYsMCwwLDAtLjQ4LjE0QTIsMiwwLDAsMCw3LDkuNDF2LjExYzAsLjIsMCwuNDEsMCwuNjF2MGEuODYuODYsMCwwLDEsMCwuMTVsMCwuMzlIN1ptLjY2LTEuMzQsMCwwYS40Ni40NiwwLDAsMSwuMjgsMCwuNi42LDAsMCwxLC4xOS4wNmMuMDksMCwuMS4xMS4wOS4xNGgwYS4zNy4zNywwLDAsMS0uMTIuMTNBLjMuMywwLDAsMSw4LDkuNzNoMGEuMzQuMzQsMCwwLDEtLjI4LS4yOFptLjc0LDNhLjIzLjIzLDAsMCwwLS4xMy4wNmwtLjE0LjE3Yy0uMTcuMjEtLjI0LjI4LS43My4zOGEuNTIuNTIsMCwwLDAtLjI2LjEuNTguNTgsMCwwLDAsLjI0LjExLDEuMTgsMS4xOCwwLDAsMCwuNzIsMEExLjcsMS43LDAsMCwwLDguNDUsMTNhLjYxLjYxLDAsMCwwLC4yLS4zMS4zNi4zNiwwLDAsMC0uMS0uMjhBLjE1LjE1LDAsMCwwLDguNCwxMi4zOVptNC42MSwwYTEuNjMsMS42MywwLDAsMS0xLjEzLDAsLjIyLjIyLDAsMCwwLS4xNCwwLC4zLjMsMCwwLDAtLjE3LjE0LDEuMDksMS4wOSwwLDAsMCwwLC4zMSwxLjgsMS44LDAsMCwwLDEuMS0uMSwxLjM2LDEuMzYsMCwwLDAsLjQ4LS4zNFptLTIuNC0yLjE0Yy0uMTQtLjQxLS4zNC0xLC4xOC0xLjM2YTEuMzUsMS4zNSwwLDAsMSwuODktLjE1QTMuMTgsMy4xOCwwLDAsMCwxMSw3LjY0bC0uMS0uMS0uMDYtLjA2aDBhLjM0LjM0LDAsMCwwLS4wNi0uMDZsMCwwLDAsMEEyLjM0LDIuMzQsMCwwLDAsMTAuMTEsNywyLjYzLDIuNjMsMCwwLDAsOSw2Ljc4YTEuNTIsMS41MiwwLDAsMC0uNy4xMUExLjc3LDEuNzcsMCwwLDAsOCw3YTIuMSwyLjEsMCwwLDAtLjc0LDEsNS44NCw1Ljg0LDAsMCwwLS4yMSwxLDEuNjYsMS42NiwwLDAsMSwxLS4yMy44NC44NCwwLDAsMSwuNzcuOTEsNy4yNiw3LjI2LDAsMCwxLDAsMS4yNywzLjg3LDMuODcsMCwwLDEtLjIzLjYzYy0uMDYuMTctLjE0LjM1LS4xOC40OWEuNS41LDAsMCwxLC4zOC4xNC42Ni42NiwwLDAsMSwuMTkuNTNIOWMwLC4wOCwwLC4xNiwwLC4yNGE2LjU1LDYuNTUsMCwwLDAsLjI0LDIuNDQuNTQuNTQsMCwwLDAsLjI0LjIxLjYuNiwwLDAsMCwuMzEuMSwxLjMsMS4zLDAsMCwwLDEtLjM0LDEuMDUsMS4wNSwwLDAsMCwuMjktLjY2Yy4wNy0uNDUuMjItMS43LjI0LTJoMGEuNzIuNzIsMCwwLDEsLjA5LS40NC42My42MywwLDAsMSwuMjctLjI0QTUuMzYsNS4zNiwwLDAsMSwxMC42MSwxMC4yNFoiIGZpbGw9IiNmMmYyZjIiIC8+PC9zdmc+" x="734" y="724" width="36" height="36"/>
+<text x="926" y="734" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" fill="#94a3b8" letter-spacing="1.4">DATABASES</text>
+<text x="734" y="790" font-family="Segoe UI,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e7eb">PostgreSQL Flexible</text>
+<text x="734" y="808" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">myapp-db · B1ms · 32 GB</text>
+</g>
+<g>
+<rect x="1040" y="710" width="220" height="110" rx="10" fill="#111827" stroke="#1f2937"/>
+<rect x="1040" y="710" width="220" height="3" rx="2" fill="#0078D4"/>
+<image href="data:image/svg+xml;base64,PHN2ZyBpZD0iYjM4OGU5NDQtNTUwOS00OWM5LTg0ZDctZjM4YmZmYTk5NWIyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImE5OTdlMjAzLTFkN2QtNGNiOS1iMTMxLTVkYzQ0ZTAyOWI0NiIgeDE9IjUuMjMiIHkxPSIxNy40NSIgeDI9IjUuMjMiIHkyPSI4LjA5IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjMTk4OGQ5IiAvPjxzdG9wIG9mZnNldD0iMC45IiBzdG9wLWNvbG9yPSIjNTRhZWYwIiAvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJlMTIyZTlkOC1hZWU1LTRmMWEtYTYwZS1iMWVhZTM1NWRhYTUiIHgxPSIxMS41IiB5MT0iMTIuNDUiIHgyPSIxMS41IiB5Mj0iMC41NSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzE5OGFiMyIgLz48c3RvcCBvZmZzZXQ9IjAuMDEiIHN0b3AtY29sb3I9IiMxOThiYjQiIC8+PHN0b3Agb2Zmc2V0PSIwLjQ0IiBzdG9wLWNvbG9yPSIjMjdiMmQ3IiAvPjxzdG9wIG9mZnNldD0iMC43OSIgc3RvcC1jb2xvcj0iIzJmY2JlZCIgLz48c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMzMmQ0ZjUiIC8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHRpdGxlPkljb24tbWFuYWdlLTMwNzwvdGl0bGU+PHBhdGggZD0iTTUuNTksMTMuMTNIOS45MXY0LjMySDUuNTlaTTEuMTUsMTcuNDVINC44N1YxMy4xM0guNTV2My43MkEuNi42LDAsMCwwLDEuMTUsMTcuNDVabS0uNi01SDQuODdWOC4wOUguNTVaIiBmaWxsPSJ1cmwoI2E5OTdlMjAzLTFkN2QtNGNiOS1iMTMxLTVkYzQ0ZTAyOWI0NikiIC8+PHBhdGggZD0iTTExLjUuNTVhNS44OSw1Ljg5LDAsMCwxLDUuOTUsNiw1Ljg5LDUuODksMCwwLDEtNS45NSw1Ljk1SDUuNTVWNi41QTUuODksNS44OSwwLDAsMSwxMS41LjU1WiIgZmlsbC1ydWxlPSJldmVub2RkIiBmaWxsPSJ1cmwoI2UxMjJlOWQ4LWFlZTUtNGYxYS1hNjBlLWIxZWFlMzU1ZGFhNSkiIC8+PHJlY3QgeD0iNy41OSIgeT0iNS42NSIgd2lkdGg9IjEuMzYiIGhlaWdodD0iNC4wOCIgZmlsbD0iI2ZmZiIgLz48cmVjdCB4PSIxMC4zMSIgeT0iNy4wMSIgd2lkdGg9IjEuMzYiIGhlaWdodD0iMi43MiIgZmlsbD0iI2ZmZiIgLz48cmVjdCB4PSIxMy4wMyIgeT0iNC4yOSIgd2lkdGg9IjEuMzYiIGhlaWdodD0iNS40NCIgZmlsbD0iI2ZmZiIgLz48L3N2Zz4=" x="1054" y="724" width="36" height="36"/>
+<text x="1246" y="734" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" fill="#94a3b8" letter-spacing="1.4">MONITOR</text>
+<text x="1054" y="790" font-family="Segoe UI,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e7eb">Log Analytics</text>
+<text x="1054" y="808" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">myapp-logs · 30-day retention</text>
+</g>
+<text x="1490" y="190" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.6" fill="#94a3b8">END USER</text>
+<g>
+<rect x="1380" y="220" width="220" height="110" rx="10" fill="#111827" stroke="#1f2937"/>
+<rect x="1380" y="220" width="220" height="3" rx="2" fill="#0078D4"/>
+<image href="data:image/svg+xml;base64,PHN2ZyBpZD0iYTU0MmNmMzktMmJhNi00MjA2LTgyNzgtNmE0ZjFjMjQ1MmY1IiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOCIgaGVpZ2h0PSIxOCIgdmlld0JveD0iMCAwIDE4IDE4Ij48ZGVmcz48cmFkaWFsR3JhZGllbnQgaWQ9ImU3NTc5ZjRkLTM2YTMtNDY5My1hNzI2LTdhNjA1MGFjNTY3MSIgY3g9Ii02ODExLjQiIGN5PSI2NzI5LjY5IiByPSIxNyIgZ3JhZGllbnRUcmFuc2Zvcm09Im1hdHJpeCgwLjUsIDAsIDAsIC0wLjUsIDM0MTQuOTEsIDMzNzQuMDUpIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHN0b3Agb2Zmc2V0PSIwLjE4IiBzdG9wLWNvbG9yPSIjNWVhMGVmIiAvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAwNzhkNCIgLz48L3JhZGlhbEdyYWRpZW50PjwvZGVmcz48dGl0bGU+SWNvbi1uZXR3b3JraW5nLTY0PC90aXRsZT48cGF0aCBpZD0iZjU3ZTEwNWQtNmQyZC00YWQ3LWI4YzMtYzEwNjg0YzlmOWI4IiBkPSJNMTQuMjEsMTUuNzJBOC41LDguNSwwLDAsMSwzLjc5LDIuMjhsLjA5LS4wNmE4LjUsOC41LDAsMCwxLDEwLjMzLDEzLjUiIGZpbGw9InVybCgjZTc1NzlmNGQtMzZhMy00NjkzLWE3MjYtN2E2MDUwYWM1NjcxKSIgLz48cGF0aCBkPSJNOSwxLjMxQTcuNjksNy42OSwwLDEsMCwxNi42OSw5LDcuNyw3LjcsMCwwLDAsOSwxLjMxWk0xNC4xNSwzLjlBNy4zNyw3LjM3LDAsMCwxLDEyLDQuNyw4LjgzLDguODMsMCwwLDAsMTAuNzUsMiw3LjIsNy4yLDAsMCwxLDE0LjE1LDMuOVpNOSwxLjc0YTYuNTksNi41OSwwLDAsMSwxLjA5LjA5aDBhNy40OCw3LjQ4LDAsMCwxLDEuNTMsMywxNS4xMiwxNS4xMiwwLDAsMS01LjQ1LDBBNy4zOCw3LjM4LDAsMCwxLDcuNjgsMS44OWwwLDBBNy4zNCw3LjM0LDAsMCwxLDksMS43NFpNNywyQTguNzIsOC43MiwwLDAsMCw1LjczLDQuNjhhNS41OCw1LjU4LDAsMCwxLTEuOS0uNzdBNy4zNSw3LjM1LDAsMCwxLDcsMlpNMy43MiwxNGE1LjI3LDUuMjcsMCwwLDEsMS43OC0uNzYsNy4wOCw3LjA4LDAsMCwwLDEuMzUsMi43MkE3LjI1LDcuMjUsMCwwLDEsMy43MiwxNFptNi40MSwyLjJBNy4wOCw3LjA4LDAsMCwxLDksMTYuMjZhNi44Myw2LjgzLDAsMCwxLTEuNDQtLjE1bDAsMGE2LDYsMCwwLDEtMS42Ny0zLDE0LjczLDE0LjczLDAsMCwxLDUuODgsMCw2LDYsMCwwLDEtMS42OSwzWm0uNzMtLjE2YTcuMTMsNy4xMywwLDAsMCwxLjM4LTIuOCw2LjY4LDYuNjgsMCwwLDEsMiwuODNBNy4xMyw3LjEzLDAsMCwxLDEwLjg2LDE2Wm0xLjQ4LTMuMjJjLjA4LS4zNi4xNS0uNzMuMi0xLjEybC0uNDYuMTFjLS4wNS4zMS0uMS42Mi0uMTcuOTFhMTUuMjMsMTUuMjMsMCwwLDAtNi4wOSwwYy0uMDctLjI3LS4xMi0uNTYtLjE3LS44NmEuMjguMjgsMCwwLDEsMC0uMDlsLS40Ni0uMTNhMi4zNiwyLjM2LDAsMCwwLDAsLjI4YzAsLjMyLjExLjYyLjE3LjkxYTUuOSw1LjksMCwwLDAtMiwuODUsNy4yNCw3LjI0LDAsMCwxLC4xMS05LjQsNi4yOSw2LjI5LDAsMCwwLDIuMDguODZjLS4wNy4yNC0uMTMuNS0uMTguNzZzMCwuMjUtLjA4LjM3bC40Ny0uMTEsMC0uMTdjLjA2LS4yNi4xMi0uNTEuMTktLjc1QTE0Ljg5LDE0Ljg5LDAsMCwwLDksNS40OGExNSwxNSwwLDAsMCwyLjc4LS4yNmMuMDcuMjcuMTQuNTYuMi44NWwuNDYuMTFxLS4xMS0uNTQtLjI0LTFhNy43Myw3LjczLDAsMCwwLDIuMy0uOTEsNy4yMiw3LjIyLDAsMCwxLC4wNiw5LjQ5QTcuMjgsNy4yOCwwLDAsMCwxMi4zNCwxMi43OVoiIGZpbGw9IiM1ZWEwZWYiIC8+PHBhdGggZD0iTTMuNjksN2E3LjkyLDcuOTIsMCwwLDEsMS4xNi0uMDgsMi40NCwyLjQ0LDAsMCwxLDEuNzEuNTJBMiwyLDAsMCwxLDcuMTUsOC45YTIuMjEsMi4yMSwwLDAsMS0uNjEsMS42NCwyLjYsMi42LDAsMCwxLTEuODYuNjEsOS4xNyw5LjE3LDAsMCwxLTEtLjA1Wm0uNTUsMy43M2E0LDQsMCwwLDAsLjU1LDBBMS42MiwxLjYyLDAsMCwwLDYuNTgsOC45MiwxLjUsMS41LDAsMCwwLDQuODcsNy4zYTMuMTcsMy4xNywwLDAsMC0uNjMsMFoiIGZpbGw9IiNmZmYiIC8+PHBhdGggZD0iTTcuODYsMTEuMTFWNi45aC41OUw5LjgsOWExMi4xOCwxMi4xOCwwLDAsMSwuNzYsMS4zN2gwYy0uMDUtLjU2LS4wNi0xLjA3LS4wNi0xLjczVjYuOUgxMXY0LjIxaC0uNTVMOS4xMyw5Yy0uMjktLjQ3LS41Ny0xLS43OS0xLjRoMGMwLC41MywwLDEsMCwxLjc0djEuOFoiIGZpbGw9IiNmZmYiIC8+PHBhdGggZD0iTTExLjg5LDEwLjQ1YTIsMiwwLDAsMCwxLC4yN2MuNTYsMCwuODgtLjI5Ljg4LS43MnMtLjIyLS42Mi0uNzktLjgzLTEuMTItLjYtMS4xMi0xLjJhMS4yMiwxLjIyLDAsMCwxLDEuMzctMS4xNCwyLDIsMCwwLDEsLjkzLjJMMTQsNy40OGExLjYzLDEuNjMsMCwwLDAtLjgtLjJjLS41OCwwLS44LjM0LS44LjYzcy4yNi41OS44NC44MSwxLjA4LjYyLDEuMDgsMS4yNC0uNDgsMS4yMS0xLjQ4LDEuMjFhMi4xNiwyLjE2LDAsMCwxLTEuMDctLjI3WiIgZmlsbD0iI2ZmZiIgLz48L3N2Zz4=" x="1394" y="234" width="36" height="36"/>
+<text x="1586" y="244" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="9" font-weight="600" fill="#94a3b8" letter-spacing="1.4">NETWORK</text>
+<text x="1394" y="300" font-family="Segoe UI,Inter,sans-serif" font-size="14" font-weight="600" fill="#e5e7eb">DNS Zone</text>
+<text x="1394" y="318" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">myapp.com · CNAME</text>
+</g>
+<g>
+  <rect x="1380" y="380" width="220" height="130" rx="10" fill="#111827" stroke="#1f2937"/>
+  <rect x="1380" y="380" width="220" height="24" rx="10" fill="#1e293b"/>
+  <circle cx="1394" cy="392" r="3" fill="#ef4444"/>
+  <circle cx="1406" cy="392" r="3" fill="#f59e0b"/>
+  <circle cx="1418" cy="392" r="3" fill="#10b981"/>
+  <rect x="1434" y="387" width="150" height="12" rx="6" fill="#0f172a"/>
+  <text x="1490" y="448" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="13" font-weight="600" fill="#e5e7eb">Browser</text>
+  <text x="1490" y="470" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#94a3b8">HTTPS · TLS 1.3</text>
+  <text x="1490" y="490" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#50E6FF">myapp.com</text>
+</g>
+<path d="M 304 510 H 350.0 V 325.0 H 394" fill="none" stroke="#D83B01" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-orange)"/><g><rect x="352.4" y="303.0" width="95.19999999999999" height="18" rx="9" fill="#0a0e1a" stroke="#D83B01" stroke-opacity="0.4"/><text x="400.0" y="316.0" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#D83B01">az acr build</text></g>
+<path d="M 626 325.0 H 704" fill="none" stroke="#D83B01" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-orange)"/><g><rect x="624.0" y="303.0" width="82.0" height="18" rx="9" fill="#0a0e1a" stroke="#D83B01" stroke-opacity="0.4"/><text x="665.0" y="316.0" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#D83B01">pull image</text></g>
+<line x1="1490" y1="376" x2="1490.0" y2="336" stroke="#0078D4" stroke-width="2" marker-end="url(#m-blue)"/><g><rect x="1465.5" y="336.0" width="49.0" height="18" rx="9" fill="#0a0e1a" stroke="#0078D4" stroke-opacity="0.4"/><text x="1490.0" y="349.0" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#0078D4">HTTPS</text></g>
+<path d="M 1490.0 214 V 130 H 510.0 V 704" fill="none" stroke="#0078D4" stroke-width="2" marker-end="url(#m-blue)"/><g><rect x="955.7" y="110" width="88.6" height="18" rx="9" fill="#0a0e1a" stroke="#0078D4" stroke-opacity="0.4"/><text x="1000.0" y="123" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#0078D4">CNAME → SWA</text></g>
+<path d="M 590 704 V 532.5 H 704" fill="none" stroke="#0078D4" stroke-width="2" marker-end="url(#m-blue)"/><g><rect x="609.0" y="512.5" width="82.0" height="18" rx="9" fill="#0a0e1a" stroke="#0078D4" stroke-opacity="0.4"/><text x="650.0" y="525.5" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#0078D4">/api proxy</text></g>
+<path d="M 830.0 456 V 580 H 830.0 V 704" fill="none" stroke="#00A4A4" stroke-width="2" marker-end="url(#m-teal)"/><g><rect x="829.0" y="558" width="82.0" height="18" rx="9" fill="#0a0e1a" stroke="#00A4A4" stroke-opacity="0.4"/><text x="870.0" y="571" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#00A4A4">TLS · 5432</text></g>
+<path d="M 956 395.0 H 1280 V 680 H 1150.0 V 704" fill="none" stroke="#8B8680" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-grey)"/><g><rect x="1282.3" y="413.0" width="75.4" height="18" rx="9" fill="#0a0e1a" stroke="#8B8680" stroke-opacity="0.4"/><text x="1320" y="426.0" text-anchor="middle" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#8B8680">telemetry</text></g>
+<path d="M 510.0 826 V 850 H 1010 V 765.0 H 1034" fill="none" stroke="#8B8680" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-grey)"/>
+<line x1="946" y1="765.0" x2="1034" y2="765.0" stroke="#8B8680" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-grey)"/>
+<rect x="40" y="940" width="1600" height="56" rx="10" fill="#111827" stroke="#1f2937"/>
+<text x="58" y="962" font-family="Segoe UI,Inter,sans-serif" font-size="10" font-weight="600" letter-spacing="1.4" fill="#94a3b8">LEGEND</text>
+<line x1="58" y1="982" x2="98" y2="982" stroke="#0078D4" stroke-width="2" marker-end="url(#m-blue)"/>
+<text x="108" y="986" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">HTTPS / public traffic</text>
+<line x1="302" y1="982" x2="342" y2="982" stroke="#00A4A4" stroke-width="2" marker-end="url(#m-teal)"/>
+<text x="352" y="986" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">Backend → Database (TLS)</text>
+<line x1="560" y1="982" x2="600" y2="982" stroke="#D83B01" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-orange)"/>
+<text x="610" y="986" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">Container image build / pull</text>
+<line x1="846" y1="982" x2="886" y2="982" stroke="#8B8680" stroke-width="2" stroke-dasharray="6,4" marker-end="url(#m-grey)"/>
+<text x="896" y="986" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">Telemetry / control plane</text>
+<rect x="1121" y="974" width="40" height="16" rx="4" fill="none" stroke="#0078D4" stroke-width="1.3" stroke-dasharray="6,4"/>
+<text x="1171" y="986" font-family="Segoe UI,Inter,sans-serif" font-size="11" fill="#e5e7eb">Resource Group / Subscription boundary</text>
+<text x="1622" y="986" text-anchor="end" font-family="Segoe UI,Inter,sans-serif" font-size="10" fill="#94a3b8">Icons © Microsoft (Azure Public Icon Set v19)</text>
 </svg>
