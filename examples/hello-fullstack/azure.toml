@@ -1,6 +1,16 @@
+# azure.toml — hello-fullstack example
+#
+# Defaults to Container Apps Express (May 2026 Public Preview).
+# Express is currently region-gated to westcentralus / eastasia; the
+# deploy-azure script transparently falls back to the Flex workload profile
+# in westeurope / eastus / eastus2.
+#
+# To force Flex in a non-Express region, set profile = "flex" below and
+# pick one of the Flex regions, or pass --profile flex on the CLI.
+
 [project]
 name = "hello-fullstack"
-region = "westeurope"
+region = "eastasia"           # Express preview region; use "westeurope" for Flex
 resource_group = "rg-hello-fullstack"
 
 [backend]
@@ -8,11 +18,11 @@ path = "backend"
 port = 8000
 app_name = "ca-hello-fullstack"
 acr_name = "hellofullstackacr"
-profile = "flex"
+profile = "express"           # express | flex | consumption
 cpu = 0.5
 memory = "2Gi"
-min_replicas = 1
-max_replicas = 10
+min_replicas = 0              # Express: scale-to-zero. Flex requires >= 1.
+max_replicas = 2              # Express preview cap. Bump to 10 on flex/consumption.
 
 [frontend]
 path = "frontend"

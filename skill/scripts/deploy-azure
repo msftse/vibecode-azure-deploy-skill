@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """deploy-azure — Vercel-like one-command deploys to Azure.
 
-Stack: Static Web Apps (frontend) + Container Apps on the **Flex** workload
-profile (backend) + Postgres Flexible Server (data). One azure.toml, idempotent.
+Stack: Static Web Apps (frontend) + Container Apps **Express** environment
+(backend, the May 2026 Public Preview env-mode) + Postgres Flexible Server
+(data). Falls back to the **Flex** workload profile in regions where Express
+isn't available yet. One azure.toml, idempotent.
 
-The Flex workload profile is the new "Container Apps Express" SKU. As of
-az CLI 2.85 it is not yet exposed as a friendly flag, so the Flex code path
-shells out to `az rest` and PUTs raw ARM bodies against the
-`Microsoft.App/managedEnvironments` and `Microsoft.App/containerApps`
-providers (api-version 2025-10-02-preview).
+Container Apps Express is the "Vercel for Azure" environment tier — no
+managed environment to configure, sub-second cold starts, scale-to-zero,
+per-second billing. It's HTTP-only and preview-gated to West Central US /
+East Asia in May 2026; everywhere else this script transparently lands you
+on the older Flex workload profile so deploys still succeed.
+
+For Flex, az CLI 2.85 still doesn't expose the workload-profile flag in a
+friendly way, so the Flex path talks to ARM REST directly. Express uses the
+proper `az containerapp --environment-mode express` flag introduced in the
+containerapp extension 1.3.0b4.
 
 Stdlib only.
 """
@@ -59,7 +66,9 @@ FLEX_RESOURCE_PAIRS: list[tuple[float, str]] = [
     (32.0, "128Gi"),
 ]
 
+# Region availability per profile (preview state, May 2026).
 FLEX_REGIONS = {"westeurope", "eastus", "eastus2"}
+EXPRESS_REGIONS = {"westcentralus", "eastasia"}
 
 
 # ---------------------------------------------------------------------------
@@ -358,6 +367,16 @@ def cmd_init(args: argparse.Namespace) -> int:
         return 2
 
     profile = args.profile
+    # Region defaulting per profile. Express is preview-gated; map the generic
+    # default to its closest supported region so 'init' produces a deployable
+    # config out of the box.
+    if profile == "express" and region == "westeurope":
+        # Args default is westeurope; if user kept it and chose express,
+        # auto-switch to the nearest supported Express region.
+        warn("Container Apps Express is preview-only in westcentralus / "
+             "eastasia. Defaulting region to eastasia (closest to EMEA). "
+             "Override with --region to pin somewhere else.")
+        region = "eastasia"
     cfg_data: dict = {
         "project": {
             "name": name,
@@ -375,10 +394,11 @@ def cmd_init(args: argparse.Namespace) -> int:
             "profile": profile,
             "cpu": 0.5,
             "memory": "2Gi",
-            # Flex requires min_replicas >= 1 in preview (no scale-to-zero yet).
-            # Consumption can scale to zero.
+            # Express: scale-to-zero (min=0, max≤2 in preview).
+            # Flex: requires min ≥ 1 in preview (no scale-to-zero yet).
+            # Consumption: scale-to-zero.
             "min_replicas": 1 if profile == "flex" else 0,
-            "max_replicas": 10,
+            "max_replicas": 2 if profile == "express" else 10,
         }
         cfg_data["backend"] = backend_cfg
     if detected["frontend"]:
@@ -418,11 +438,18 @@ def cmd_up(args: argparse.Namespace) -> int:
     cfg = Config.load()
     ensure_auth()
 
-    # Profile precedence: CLI flag > config > "flex".
-    profile = args.profile or (cfg.backend or {}).get("profile") or "flex"
-    if profile not in ("flex", "consumption"):
-        err(f"Unknown profile: {profile}. Use 'flex' or 'consumption'.")
+    # Profile precedence: CLI flag > config > "express".
+    profile = args.profile or (cfg.backend or {}).get("profile") or "express"
+    if profile not in ("express", "flex", "consumption"):
+        err(f"Unknown profile: {profile}. Use 'express', 'flex' or 'consumption'.")
         return 2
+    if profile == "express" and cfg.region not in EXPRESS_REGIONS:
+        warn(f"Region {cfg.region} is not in the known Express preview region list "
+             f"({sorted(EXPRESS_REGIONS)}). Container Apps Express is preview-gated "
+             f"to West Central US and East Asia. Falling back to 'flex' so the "
+             f"deploy still succeeds; rerun with --profile express once your region "
+             f"is supported.")
+        profile = "flex"
     if profile == "flex" and cfg.region not in FLEX_REGIONS:
         warn(f"Region {cfg.region} is not in the known Flex region list "
              f"({sorted(FLEX_REGIONS)}). Continuing — Microsoft may have "
@@ -459,7 +486,7 @@ def _print_banner(profile: str, elapsed: float,
     if frontend_url:
         print(f"  frontend : https://{frontend_url}")
     print(f"  profile  : {profile}")
-    print(f"  powered by: Azure Container Apps · ARM api {ARM_API_VERSION}")
+    print(f"  powered by: Azure Container Apps (Express/Flex preview) · ARM api {ARM_API_VERSION}")
     print(f"\033[36m{line}\033[0m")
 
 
@@ -522,6 +549,10 @@ def _ensure_backend(cfg: Config, profile: str) -> Optional[str]:
     min_replicas = int(b.get("min_replicas", 1 if profile == "flex" else 0))
     max_replicas = int(b.get("max_replicas", 10))
 
+    if profile == "express":
+        return _express_deploy(cfg, env_name, app, image, port,
+                               reg_user, reg_pw, acr, cpu, memory,
+                               min_replicas, max_replicas)
     if profile == "flex":
         return _flex_deploy(cfg, env_name, app, image, port,
                             reg_user, reg_pw, cpu, memory,
@@ -652,6 +683,99 @@ def _flex_deploy(cfg: Config, env_name: str, app: str, image: str, port: int,
             .get("configuration", {}).get("ingress", {}).get("fqdn"))
     ok(f"Container App {app} ready.")
     return fqdn
+
+
+# --- Express (env-mode express, az CLI 1.3.0b4+) ----------------------------
+#
+# Container Apps Express is the "Vercel-grade" environment mode launched
+# May 2026 (Public Preview, see https://aka.ms/aca-express). It removes the
+# managed-environment configuration surface entirely: you pass
+# --environment-mode express and Azure provisions a lightweight, fully
+# managed env on shared sandbox capacity with sensible defaults baked in
+# (consumption CPU, scale-to-zero, sub-second cold starts).
+#
+# Preview gotchas (validated 2026-05-16 against the live API):
+# - Region: only westcentralus / eastasia. Locations map to a "Stage"
+#   sub-region (e.g. North Central US Stage) under the hood — this is normal.
+# - HTTP only, no TCP, no VNet, no managed identity, no autoscaling yet
+#   (FAQ: https://learn.microsoft.com/azure/container-apps/express-faq).
+# - The new portal lives at https://containerapps.azure.com.
+# - Max 2 min replicas per app in preview.
+#
+# We use the `az containerapp` extension (≥ 1.3.0b4) directly here — the
+# friendly --environment-mode express flag is fully wired in the CLI for
+# Express, unlike Flex which still needs raw ARM REST.
+
+def _consumption_only_env_exists(env_name: str, cfg: "Config") -> bool:
+    existing = az_json(["containerapp", "env", "show",
+                        "-g", cfg.rg, "-n", env_name])
+    if not isinstance(existing, dict):
+        return False
+    mode = ((existing.get("properties") or {}).get("environmentMode") or "")
+    return mode.lower() == "express"
+
+
+def _express_deploy(cfg: "Config", env_name: str, app: str, image: str,
+                    port: int, reg_user: str, reg_pw: str, acr: str,
+                    cpu: float, memory: str,
+                    min_replicas: int, max_replicas: int) -> Optional[str]:
+    info(f"Ensuring Express managed environment {env_name}…")
+    if not _consumption_only_env_exists(env_name, cfg):
+        run(["az", "containerapp", "env", "create",
+             "--environment-mode", "express",
+             "-g", cfg.rg, "-n", env_name, "-l", cfg.region,
+             "--logs-destination", "none"], capture=True)
+    ok(f"Express env {env_name} ready (mode=Express, scale-to-zero).")
+
+    # Express caps min replicas at 2 in preview; clamp to be safe.
+    if max_replicas > 2:
+        warn(f"Express preview caps replicas at 2; lowering {max_replicas} → 2.")
+        max_replicas = 2
+    if min_replicas > max_replicas:
+        min_replicas = max_replicas
+
+    secrets_args: list[str] = []
+    env_args: list[str] = []
+    if cfg.db and cfg.db.get("connection_string"):
+        secrets_args = ["--secrets", f"database-url={cfg.db['connection_string']}"]
+        env_args = ["--env-vars", "DATABASE_URL=secretref:database-url"]
+
+    existing = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app])
+    if not existing:
+        info(f"Creating Express container app {app}…")
+        create_cmd = [
+            "az", "containerapp", "create",
+            "-g", cfg.rg, "-n", app,
+            "--environment", env_name,
+            "--image", image,
+            "--target-port", str(port),
+            "--ingress", "external",
+            "--registry-server", f"{acr}.azurecr.io",
+            "--registry-username", reg_user,
+            "--registry-password", reg_pw,
+            "--cpu", str(cpu),
+            "--memory", memory,
+            "--min-replicas", str(min_replicas),
+            "--max-replicas", str(max_replicas),
+        ] + secrets_args + env_args
+        run(create_cmd, capture=True)
+    else:
+        info(f"Updating Express container app {app}…")
+        update_cmd = ["az", "containerapp", "update",
+                      "-g", cfg.rg, "-n", app, "--image", image]
+        if env_args:
+            update_cmd += env_args
+        run(update_cmd, capture=True)
+        if secrets_args:
+            run(["az", "containerapp", "secret", "set",
+                 "-g", cfg.rg, "-n", app] + secrets_args, capture=True)
+    ok(f"Container App {app} ready (Express).")
+
+    fqdn = az_json(["containerapp", "show", "-g", cfg.rg, "-n", app,
+                    "--query", "properties.configuration.ingress.fqdn"])
+    info("Manage this app in the new Container Apps portal: "
+         "https://containerapps.azure.com")
+    return fqdn if isinstance(fqdn, str) else None
 
 
 # --- Consumption (az CLI) ----------------------------------------------------
@@ -880,22 +1004,25 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="deploy-azure",
         description="One-command fullstack deploys to Azure "
-                    "(Vercel-grade DX, powered by Container Apps Flex).",
+                    "(Vercel-grade DX, powered by Container Apps Express).",
     )
     sub = p.add_subparsers(dest="cmd", required=True, metavar="COMMAND")
 
     p_init = sub.add_parser("init", help="Scan repo and write azure.toml.")
     p_init.add_argument("--name")
     p_init.add_argument("--region", default="westeurope")
-    p_init.add_argument("--profile", choices=["flex", "consumption"],
-                        default="flex",
-                        help="Container Apps workload profile (default: flex).")
+    p_init.add_argument("--profile",
+                        choices=["express", "flex", "consumption"],
+                        default="express",
+                        help="Container Apps profile (default: express — "
+                             "the new May 2026 Public Preview env-mode).")
     p_init.add_argument("--dry-run", action="store_true")
     p_init.add_argument("--force", action="store_true")
     p_init.set_defaults(func=cmd_init)
 
     p_up = sub.add_parser("up", help="Idempotent deploy (build, push, ensure).")
-    p_up.add_argument("--profile", choices=["flex", "consumption"], default=None,
+    p_up.add_argument("--profile",
+                      choices=["express", "flex", "consumption"], default=None,
                       help="Override the profile from azure.toml.")
     p_up.add_argument("--yes", action="store_true")
     p_up.set_defaults(func=cmd_up)
