@@ -22,9 +22,22 @@ deploy-azure up       # builds, pushes, and provisions everything via ARM
 
 ## Tools required on PATH
 
-- `az` (Azure CLI, ≥ 2.85)
-- `docker` (for building/pushing the backend image)
+- `az` (Azure CLI, ≥ 2.85) — includes `az acr build`, which we use to build images in the cloud
 - Python 3.11+ (the script re-execs under a newer interpreter if invoked under 3.9)
+
+> No local Docker daemon required. Images are built and pushed by `az acr build` running on ACR's own build agent. This sidesteps Docker Desktop credential-helper hangs and works inside CI runners that don't have Docker available.
+
+## Researching Azure APIs
+
+Before changing any ARM body, region availability claim, SKU list, or preview-API behaviour in this skill, query the official Microsoft docs via the **Microsoft Learn MCP** (`mcp_microsoft_learn_*` tools). It's the canonical source — fresher than Stack Overflow, less hallucinated than a web search.
+
+Recommended queries:
+
+- `microsoft_docs_search("Container Apps Flex workload profile workloadProfileType")` — for the env/app ARM body shape
+- `microsoft_code_sample_search("az acr build linux/amd64")` — for the build/push pipeline
+- `microsoft_docs_fetch(url)` — to pull a specific learn.microsoft.com page in full
+
+If you discover a Flex constraint, a new region, or an API-version bump that's not in this skill, patch it.
 
 ## Auth
 

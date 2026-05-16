@@ -38,7 +38,18 @@ cd vibecode-azure-deploy-skill/examples/hello-fullstack
 # → https://your-app.westeurope.azurecontainerapps.io
 ```
 
-Prereqs: `az` ≥ 2.85, Docker, Python 3.11+, an `az login` session (or service-principal env vars).
+Prereqs: `az` ≥ 2.85, Python 3.11+, an `az login` session (or service-principal env vars). No local Docker required — images are built in the cloud via `az acr build`.
+
+### ✅ Live proof
+
+A real backend was deployed end-to-end with this script in West Europe on the Flex profile:
+
+```
+GET https://ca-vibecode-demo.delightfulhill-c9a8cab6.westeurope.azurecontainerapps.io/healthz
+→ 200 {"ok": true}
+```
+
+Build time: ~45s (cloud build) · env provision: ~20s · app provision: ~15s · total wall: ~90s.
 
 ## 📦 What you get
 

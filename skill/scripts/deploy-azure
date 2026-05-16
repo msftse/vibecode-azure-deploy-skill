@@ -492,14 +492,17 @@ def _ensure_acr_and_image(cfg: Config) -> tuple[str, str, str, str]:
                 sys.exit(1)
     ok(f"ACR {acr} ready.")
 
-    image = f"{acr}.azurecr.io/{cfg.project}:latest"
-    info("Logging in to ACR…")
-    run(["az", "acr", "login", "-n", acr], capture=True)
-    info(f"Building image {image} (linux/amd64)…")
-    run(["docker", "build", "--platform", "linux/amd64", "-t", image, b["path"]])
-    info("Pushing image…")
-    run(["docker", "push", image])
-    ok("Image pushed.")
+    image_ref = f"{cfg.project}:latest"
+    image = f"{acr}.azurecr.io/{image_ref}"
+    info(f"Building image {image} via ACR cloud build (linux/amd64)…")
+    # Cloud-side build: no local Docker daemon required. Streams build logs
+    # from the ACR build agent and pushes to the registry on success.
+    run(["az", "acr", "build",
+         "-r", acr,
+         "-t", image_ref,
+         "--platform", "linux/amd64",
+         b["path"]])
+    ok("Image built and pushed.")
 
     cred = az_json(["acr", "credential", "show", "-n", acr])
     return acr, image, cred["username"], cred["passwords"][0]["value"]
